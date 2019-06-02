@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="str-test">
+      <UniqueIdentifier>{def6b2a5-a03b-4254-9608-73c31fbcf6e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="os-test">
+      <UniqueIdentifier>{afa6b47d-684b-437a-8077-832e2a1412c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ps-test">
+      <UniqueIdentifier>{a84af1fa-66c4-4516-a490-5b80abf1d4c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{fccfef2b-0520-40b7-b94b-1421519014bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fs-test">
+      <UniqueIdentifier>{477e8bb7-7df9-47a3-9a4b-70e5722e6aa8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ob-test">
+      <UniqueIdentifier>{dc505d35-53be-4eda-a264-e2e50ac57acd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="unone-test.cpp" />
+    <ClCompile Include="unone-os-test\unone-os-test.cpp">
+      <Filter>os-test</Filter>
+    </ClCompile>
+    <ClCompile Include="unone-ps-test\unone-ps-test.cpp">
+      <Filter>ps-test</Filter>
+    </ClCompile>
+    <ClCompile Include="unone-str-test\unone-str-test.cpp">
+      <Filter>str-test</Filter>
+    </ClCompile>
+    <ClCompile Include="unone-fs-test\unone-fs-test.cpp">
+      <Filter>fs-test</Filter>
+    </ClCompile>
+    <ClCompile Include="unone-ob-test\unone-ob-test.cpp">
+      <Filter>ob-test</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="unone-str-test\unone-str-test.h">
+      <Filter>str-test</Filter>
+    </ClInclude>
+    <ClInclude Include="common\common.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="unone-os-test\unone-os-test.h">
+      <Filter>os-test</Filter>
+    </ClInclude>
+    <ClInclude Include="unone-ps-test\unone-ps-test.h">
+      <Filter>ps-test</Filter>
+    </ClInclude>
+    <ClInclude Include="unone-fs-test\unone-fs-test.h">
+      <Filter>fs-test</Filter>
+    </ClInclude>
+    <ClInclude Include="unone-ob-test\unone-ob-test.h">
+      <Filter>ob-test</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

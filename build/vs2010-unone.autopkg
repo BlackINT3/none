@@ -1,0 +1,70 @@
+nuget {    
+    nuspec {
+        id = vs2010-unone;
+        version : 1.0.0;
+        title: UNONE;
+        authors: BlackINT3;
+        owners: BlackINT3;
+        licenseUrl: "https://github.com/BlackINT3/none";
+        projectUrl: "https://github.com/BlackINT3/none";
+        iconUrl: "https://github.com/BlackINT3/none";
+        requireLicenseAcceptance:false;
+        summary: nothing;
+        description: "nothing";
+        releaseNotes: "nothing";
+        copyright: BlackINT3;
+        tags: {UNONE, Windows};
+    }
+    
+    files {
+  
+        #defines {
+            root = .\unone;
+        };
+        
+        include: { 
+            ${root}\**\*.h;
+        };
+        
+        [v100,Desktop,Win32,Debug,static] {
+            lib: {
+                ${root}\unone-v100-static-debug32.lib
+            };
+        }
+        [v100,Desktop,Win32,Release,static] {
+            lib: {
+                ${root}\unone-v100-static-release32.lib
+            };
+        }
+        [v100,Desktop,Win32,Debug,dynamic] {
+            lib: {
+                ${root}\unone-v100-dynamic-debug32.lib
+            };
+        }
+        [v100,Desktop,Win32,Release,dynamic] {
+            lib: {
+                ${root}\unone-v100-dynamic-release32.lib
+            };
+        }        
+        [v100,Desktop,x64,Debug,static] {
+            lib: {
+                ${root}\unone-v100-static-debug64.lib
+            };
+        }
+        [v100,Desktop,x64,Release,static] {
+            lib: {
+                ${root}\unone-v100-static-release64.lib
+            };
+        }
+        [v100,Desktop,x64,Debug,dynamic] {
+            lib: {
+                ${root}\unone-v100-dynamic-debug64.lib
+            };
+        }
+        [v100,Desktop,x64,Release,dynamic] {
+            lib: {
+                ${root}\unone-v100-dynamic-release64.lib
+            };
+        }
+    }
+}

@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="string">
+      <UniqueIdentifier>{b17ec8fc-159d-40a7-b55c-a6487896fa9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="os">
+      <UniqueIdentifier>{9efc04e3-1c5f-45ab-82bc-3856a3a16d64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="process">
+      <UniqueIdentifier>{a132bfb1-efa6-471a-beb0-cc8e5c523a49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="plugins">
+      <UniqueIdentifier>{42aa1b15-696e-4cb6-aabb-62133fb2ef4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{698ef990-e6a8-400d-9b8d-347b176031f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pe">
+      <UniqueIdentifier>{232d98e4-ff18-495b-bbd4-e1180041298b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="file">
+      <UniqueIdentifier>{9a1f3446-4861-4db1-a670-4212bd195087}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="memory">
+      <UniqueIdentifier>{596f2901-fad2-473a-b59c-424dccb764be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="security">
+      <UniqueIdentifier>{17df6905-05bc-405a-b361-c2fb6b561d5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="object">
+      <UniqueIdentifier>{b9af2a6e-8e9e-480c-aa26-fb0e7b0f3b26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="process\inject">
+      <UniqueIdentifier>{aa2c3974-7d29-4958-8e85-fb5d4b4af6af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="process\wow64">
+      <UniqueIdentifier>{a0004be6-1fea-4de5-bea7-1bb43003d2ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="time">
+      <UniqueIdentifier>{33ce626f-fc96-4b0c-b7ea-40a20227d00a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="registry">
+      <UniqueIdentifier>{7a7e0541-3797-42b2-9cf6-b219a01c00d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="network">
+      <UniqueIdentifier>{500d1f45-39d3-4cdb-abe0-e9b5fd12fae9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="native">
+      <UniqueIdentifier>{c9d4ae04-4bbc-4ebd-a6fb-681835896f1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="internal">
+      <UniqueIdentifier>{dc796699-ca94-4b73-94df-5522f8562162}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="unone.cpp" />
+    <ClCompile Include="process\unone-ps.cpp">
+      <Filter>process</Filter>
+    </ClCompile>
+    <ClCompile Include="string\unone-str.cpp">
+      <Filter>string</Filter>
+    </ClCompile>
+    <ClCompile Include="os\unone-os.cpp">
+      <Filter>os</Filter>
+    </ClCompile>
+    <ClCompile Include="file\unone-fs.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="memory\unone-mm.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="pe\unone-pe.cpp">
+      <Filter>pe</Filter>
+    </ClCompile>
+    <ClCompile Include="security\unone-se.cpp">
+      <Filter>security</Filter>
+    </ClCompile>
+    <ClCompile Include="object\unone-ob.cpp">
+      <Filter>object</Filter>
+    </ClCompile>
+    <ClCompile Include="process\wow64\wow64ext.cpp">
+      <Filter>process\wow64</Filter>
+    </ClCompile>
+    <ClCompile Include="time\unone-tm.cpp">
+      <Filter>time</Filter>
+    </ClCompile>
+    <ClCompile Include="process\inject\inject.cpp">
+      <Filter>process\inject</Filter>
+    </ClCompile>
+    <ClCompile Include="network\unone-net.cpp">
+      <Filter>network</Filter>
+    </ClCompile>
+    <ClCompile Include="registry\unone-reg.cpp">
+      <Filter>registry</Filter>
+    </ClCompile>
+    <ClCompile Include="native\unone-native.cpp">
+      <Filter>native</Filter>
+    </ClCompile>
+    <ClCompile Include="internal\unone-internal.cpp">
+      <Filter>internal</Filter>
+    </ClCompile>
+    <ClCompile Include="common\unone-common.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="unone.h" />
+    <ClInclude Include="process\unone-ps.h">
+      <Filter>process</Filter>
+    </ClInclude>
+    <ClInclude Include="string\unone-str.h">
+      <Filter>string</Filter>
+    </ClInclude>
+    <ClInclude Include="os\unone-os.h">
+      <Filter>os</Filter>
+    </ClInclude>
+    <ClInclude Include="common\unone-common.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="file\unone-fs.h">
+      <Filter>file</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\unone-mm.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="pe\unone-pe.h">
+      <Filter>pe</Filter>
+    </ClInclude>
+    <ClInclude Include="security\unone-se.h">
+      <Filter>security</Filter>
+    </ClInclude>
+    <ClInclude Include="object\unone-ob.h">
+      <Filter>object</Filter>
+    </ClInclude>
+    <ClInclude Include="process\wow64\CMemPtr.h">
+      <Filter>process\wow64</Filter>
+    </ClInclude>
+    <ClInclude Include="process\wow64\internal.h">
+      <Filter>process\wow64</Filter>
+    </ClInclude>
+    <ClInclude Include="process\wow64\resource.h">
+      <Filter>process\wow64</Filter>
+    </ClInclude>
+    <ClInclude Include="process\wow64\wow64ext.h">
+      <Filter>process\wow64</Filter>
+    </ClInclude>
+    <ClInclude Include="time\unone-tm.h">
+      <Filter>time</Filter>
+    </ClInclude>
+    <ClInclude Include="network\unone-net.h">
+      <Filter>network</Filter>
+    </ClInclude>
+    <ClInclude Include="plugins\unone-plugins.h">
+      <Filter>plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="registry\unone-reg.h">
+      <Filter>registry</Filter>
+    </ClInclude>
+    <ClInclude Include="native\unone-native.h">
+      <Filter>native</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\unone-internal.h">
+      <Filter>internal</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
