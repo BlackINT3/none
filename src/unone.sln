@@ -86,8 +86,8 @@ Global
 		{658AB9A2-3EC1-4FFA-AD37-6EB940645BF9}.v120-dynamic-release|32.Build.0 = v120-dynamic-release|Win32
 		{658AB9A2-3EC1-4FFA-AD37-6EB940645BF9}.v120-dynamic-release|64.ActiveCfg = v120-dynamic-release|x64
 		{658AB9A2-3EC1-4FFA-AD37-6EB940645BF9}.v120-dynamic-release|64.Build.0 = v120-dynamic-release|x64
-		{658AB9A2-3EC1-4FFA-AD37-6EB940645BF9}.v120-dynamic-release-dll|32.ActiveCfg = v100-static-debug|Win32
-		{658AB9A2-3EC1-4FFA-AD37-6EB940645BF9}.v120-dynamic-release-dll|32.Build.0 = v100-static-debug|Win32
+		{658AB9A2-3EC1-4FFA-AD37-6EB940645BF9}.v120-dynamic-release-dll|32.ActiveCfg = v120-dynamic-release-dll|Win32
+		{658AB9A2-3EC1-4FFA-AD37-6EB940645BF9}.v120-dynamic-release-dll|32.Build.0 = v120-dynamic-release-dll|Win32
 		{658AB9A2-3EC1-4FFA-AD37-6EB940645BF9}.v120-dynamic-release-dll|64.ActiveCfg = v120-dynamic-release-dll|x64
 		{658AB9A2-3EC1-4FFA-AD37-6EB940645BF9}.v120-dynamic-release-dll|64.Build.0 = v120-dynamic-release-dll|x64
 		{658AB9A2-3EC1-4FFA-AD37-6EB940645BF9}.v120-static-debug|32.ActiveCfg = v120-static-debug|Win32
