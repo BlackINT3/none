@@ -15,32 +15,25 @@ UNONE is a open source base library that makes it easy to develop software on Wi
 * Mm - Memory and Section
 * Ob - Object utility
 * Se - Security and Privilege
-* Tm - Time
+* Tm - Time utility
 * Pe - PE Parser
-* Net - Network
+* Net - Network utility
 * Reg - Registry
 * Int - UNONE internals
 * Native - Windows Native structures, types, undocument API and more
-* Plugins - Thirdparty library and wrapper and more unone-based componments
+* Plugins - 3rd-library and wrapper and unone-based componments
 
-### How to use
-#### Use package form disk
-* Open console (View - Other Windows - Package Manager Conosle)
-* Install: Install-Package C:\unone-*.nukpg
+### How to use ?
+Use nuget package
+* Install by disk: Open console (View - Other Windows - Package Manager Conosle), Install-Package C:\vs2015-unone.1.0.0.nupkg
+* Install by server: Set Nuget sources url (Tools - Options - Nuget Package Manager - Package Sources)
+* Uninstall: Uninstall-Package vs2015-unone
+* BTW: Nuget must be installed manualy in Visual Studio 2010.
 
-#### Use package form server
-* Set Nuget sources url (Tools - Options - Nuget Package Manager - Package Sources)
-* Install pacakge for Projects
-
-Nuget adddon neeed if Visual Studio 2010 used.
-
-#### Use libs or dlls
-* Include headers and libs/dlls, just build it.
-
-#### Uninstall: Uninstall-Package unone
-* Uninstall-Package unone
+Use libs or dlls
+* Include headers and libs/dlls, then build it.
  
-### Who used
+### Who used ?
   * [OpenArk](https://github.com/BlackINT3/OpenArk)
 
 ### Distributions
