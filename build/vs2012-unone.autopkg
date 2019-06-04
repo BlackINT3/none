@@ -1,6 +1,6 @@
 nuget {    
     nuspec {
-        id = vs2010-unone;
+        id = vs2012-unone;
         version : 1.0.0;
         title: UNONE;
         authors: BlackINT3;
