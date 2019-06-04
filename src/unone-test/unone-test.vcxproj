@@ -485,181 +485,217 @@
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v100-static-debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v120-static-debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v120-static-debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v140-static-debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v140-static-debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v100-dynamic-debug-dll|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
+    <IntDir>intermediate-files\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v100-dynamic-debug-dll|x64'">
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v120-dynamic-debug-dll|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
+    <IntDir>intermediate-files\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v120-dynamic-debug-dll|x64'">
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v140-dynamic-debug-dll|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
+    <IntDir>intermediate-files\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v140-dynamic-debug-dll|x64'">
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v100-dynamic-release-dll|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
+    <IntDir>intermediate-files\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v100-dynamic-release-dll|x64'">
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v120-dynamic-release-dll|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
+    <IntDir>intermediate-files\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v120-dynamic-release-dll|x64'">
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v140-dynamic-release-dll|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
+    <IntDir>intermediate-files\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v140-dynamic-release-dll|x64'">
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v100-dynamic-debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v100-dynamic-debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v120-dynamic-debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v120-dynamic-debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v140-dynamic-debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v140-dynamic-debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v100-static-release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v100-static-release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v120-static-release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v120-static-release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v140-static-release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v140-static-release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v100-dynamic-release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v100-dynamic-release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v120-dynamic-release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v120-dynamic-release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v140-dynamic-release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='v140-dynamic-release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)-$(Configuration)$(PlatformArchitecture)</TargetName>
     <OutDir>$(SolutionDir)..\build\bin</OutDir>
+    <IntDir>intermediate-files\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='v100-static-debug|Win32'">
     <ClCompile>

@@ -5,7 +5,7 @@ if exist unone rd /q /s unone
 @rem del *.autopkg *.nupkg
 
 echo.
-echo [+] Nuget packaging...
+echo [+] Copying...
 
 ::CopyFiles
 set SOURCE_DIR=%CD%/../src
@@ -41,5 +41,12 @@ xcopy /E /Y  "%DEST_DIR%"\bin\*.lib  "%DEST_DIR%"\unone
 xcopy /E /Y  "%DEST_DIR%"\bin\*.dll  "%DEST_DIR%"\unone
 echo.
 echo [+] Copy all files completed...
+
+echo.
+echo [+] Nuget packing...
+for %%i in (*.autopkg) do (
+  powershell Write-NugetPackage %%i -NoSplit -Verbose
+)
+echo [+] Nuget pack completed...
 
 ping -n 1 127.0.0.1>nul
