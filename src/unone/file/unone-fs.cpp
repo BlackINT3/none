@@ -481,61 +481,6 @@ std::wstring FsPathStandardW(__in const std::wstring& fpath)
 
 /*++
 Description:
-	create directory, could be created recursively 
-Arguments:
-	dir - directory
-Return:
-	bool
---*/
-bool FsCreateDirA(const std::string& dir)
-{
-	return FsCreateDirW(StrToW(dir));
-}
-
-/*++
-Description:
-	create directory, could be created recursively  
-Arguments:
-	dir - directory
-Return:
-	bool
---*/
-bool FsCreateDirW(const std::wstring& dir)
-{
-	if (FsIsExistedW(dir))
-		return true;
-	if (CreateDirectoryW(dir.c_str(),NULL))
-		return true;
-
-	bool result = true;
-	std::vector<std::wstring> subdirs;
-	std::wstring sub = dir;
-	std::wstring str;
-	do {
-		str = sub;
-		subdirs.push_back(sub);
-		sub = FsPathToDirW(str);
-	} while (str.compare(sub) != 0);
-
-	int k = 0;
-	for (int i=(int)subdirs.size()-1; i>=0; i--) {
-		if (FsIsExistedW(subdirs[i])) {
-			k = i;
-			continue;
-		}
-		if (!CreateDirectoryW(subdirs[i].c_str(),NULL)) {
-			//fail rollback
-			for (int j=i; j<k; j++)
-				RemoveDirectoryW(subdirs[j].c_str());
-			result = false;
-			break;
-		}
-	}
-	return result;
-}
-
-/*++
-Description:
 	check directory/file is existed
 Arguments:
 	fpath - directory/file path
@@ -930,6 +875,176 @@ bool FsEnumDirectoryW(__in const std::wstring& dir, __inout FileCallbackW callba
 	} while (FindNextFileW(hfind, &find_data));
 	FindClose(hfind);
 	return true;
+}
+
+/*++
+Description:
+	create directory, could be created recursively 
+Arguments:
+	dir - directory
+Return:
+	bool
+--*/
+bool FsCreateDirA(const std::string& dir)
+{
+	return FsCreateDirW(StrToW(dir));
+}
+
+/*++
+Description:
+	create directory, could be created recursively  
+Arguments:
+	dir - directory
+Return:
+	bool
+--*/
+bool FsCreateDirW(const std::wstring& dir)
+{
+	if (FsIsExistedW(dir))
+		return true;
+	if (CreateDirectoryW(dir.c_str(),NULL))
+		return true;
+
+	bool result = true;
+	std::vector<std::wstring> subdirs;
+	std::wstring sub = dir;
+	std::wstring str;
+	do {
+		str = sub;
+		subdirs.push_back(sub);
+		sub = FsPathToDirW(str);
+	} while (str.compare(sub) != 0);
+
+	int k = 0;
+	for (int i=(int)subdirs.size()-1; i>=0; i--) {
+		if (FsIsExistedW(subdirs[i])) {
+			k = i;
+			continue;
+		}
+		if (!CreateDirectoryW(subdirs[i].c_str(),NULL)) {
+			//fail rollback
+			for (int j=i; j<k; j++)
+				RemoveDirectoryW(subdirs[j].c_str());
+			result = false;
+			break;
+		}
+	}
+	return result;
+}
+
+/*++
+Description:
+	copy file or directory, directory will be created automatically
+Arguments:
+	src - source path
+	dst - destination path
+Return:
+	bool
+--*/
+bool FsCopyA(const std::string &src, const std::string &dst)
+{
+	return FsCopyW(StrToW(src), StrToW(dst));
+}
+
+/*++
+Description:
+	copy file or directory
+Arguments:
+	src - source path
+	dst - destination path
+Return:
+	bool
+--*/
+bool FsCopyW(const std::wstring &src, const std::wstring &dst)
+{
+	if (UNONE::FsIsDirW(src))
+		return FsCopyDirectoryW(src, dst);
+	else
+		return FsCopyFileW(src, dst);
+}
+
+/*++
+Description:
+	copy file, directory will be created automatically
+Arguments:
+	src - source path
+	dst - destination path
+Return:
+	bool
+--*/
+bool FsCopyFileA(const std::string &src, const std::string &dst)
+{
+	return FsCopyFileW(StrToW(src), StrToW(dst));
+}
+
+/*++
+Description:
+	copy file, directory will be created automatically
+Arguments:
+	src - source path
+	dst - destination path
+Return:
+	bool
+--*/
+bool FsCopyFileW(const std::wstring &src, const std::wstring &dst)
+{
+	bool created = false;
+	std::wstring &&dst_dir = UNONE::FsPathToDirW(dst);
+	if (!UNONE::FsIsExistedW(dst_dir)) {
+		UNONE::FsCreateDirW(dst_dir);
+		created = true;
+	}
+	if (!CopyFileW(src.c_str(), dst.c_str(), FALSE)) {
+		if (created) UNONE::FsDeleteDirectoryW(dst_dir);
+		return false;
+	}
+	return true;
+}
+
+/*++
+Description:
+	copy directory,included all children, directory will be created automatically
+Arguments:
+	src - source path
+	dst - destination path
+Return:
+	bool
+--*/
+bool FsCopyDirectoryA(const std::string &src, const std::string &dst)
+{
+	return FsCopyDirectoryW(StrToW(src), StrToW(dst));
+}
+
+/*++
+Description:
+	copy directory,included all children, directory will be created automatically
+Arguments:
+	src - source path
+	dst - destination path
+Return:
+	bool
+--*/
+bool FsCopyDirectoryW(const std::wstring &src, const std::wstring &dst)
+{
+	if (!UNONE::FsIsExistedW(src)) return false;
+	if (!UNONE::FsCreateDirW(dst)) return false;
+
+	bool ret = true;
+	UNONE::FsEnumDirectoryW(src, [&](wchar_t* path, wchar_t* name, void* param)->bool {
+		std::wstring to_path(path);
+		UNONE::StrReplaceIW(to_path, src, dst);
+		if (UNONE::FsIsDirW(path)) {
+			if (!UNONE::FsIsExistedW(to_path)) UNONE::FsCreateDirW(to_path);
+			ret = FsCopyDirectoryW(path, to_path);
+		}
+		else {
+			ret = (CopyFileW(path, to_path.c_str(), FALSE) == TRUE);
+		}
+		return ret;
+	});
+	if (!ret) UNONE::FsDeleteDirectoryW(dst);
+
+	return ret;
 }
 
 /*++

@@ -34,7 +34,7 @@ Arguments:
 Return:
 	image base
 --*/
-UNONE_API CHAR* PeMapImage(__in CHAR *file_buf, __in DWORD file_size)
+CHAR* PeMapImage(__in CHAR *file_buf, __in DWORD file_size)
 {
 	// check 1
 	if (!file_buf || !file_size || !PeValid(file_buf))
@@ -96,7 +96,7 @@ Arguments:
 Return:
 	image base
 --*/
-UNONE_API CHAR* PeMapImageByPathA(__in const std::string &path)
+CHAR* PeMapImageByPathA(__in const std::string &path)
 {
 	return PeMapImageByPathW(StrToW(path));
 }
@@ -109,7 +109,7 @@ Arguments:
 Return:
 	image base
 --*/
-UNONE_API CHAR* PeMapImageByPathW(__in const std::wstring &path)
+CHAR* PeMapImageByPathW(__in const std::wstring &path)
 {
 	DWORD file_size = 0;
 	HANDLE fd, hmap;
@@ -128,7 +128,7 @@ Arguments:
 Return:
 	BOOL
 --*/
-UNONE_API bool PeUnmapImage(__in CHAR *base)
+bool PeUnmapImage(__in CHAR *base)
 {
 	if (!base) return FALSE;
 	return VirtualFree(base, 0, MEM_RELEASE) == TRUE;
@@ -143,7 +143,7 @@ Arguments:
 Return:
 	raw
 --*/
-UNONE_API DWORD PeRvaToRaw(__in CHAR *base, __in DWORD rva)
+DWORD PeRvaToRaw(__in CHAR *base, __in DWORD rva)
 {
 	PIMAGE_NT_HEADERS nt_hdr = PE_NT_HEADER(base);
 	PIMAGE_SECTION_HEADER section = IMAGE_FIRST_SECTION(nt_hdr);
@@ -167,7 +167,7 @@ Arguments:
 Return:
 	rva
 --*/
-UNONE_API DWORD PeRawToRva(__in CHAR *base, __in DWORD raw)
+DWORD PeRawToRva(__in CHAR *base, __in DWORD raw)
 {
 	PIMAGE_NT_HEADERS nt_hdr = PE_NT_HEADER(base);
 	PIMAGE_SECTION_HEADER section = IMAGE_FIRST_SECTION(nt_hdr);
@@ -190,7 +190,7 @@ Arguments:
 Return:
 	BOOL
 --*/
-UNONE_API bool PeValid(__in CHAR *base)
+bool PeValid(__in CHAR *base)
 {
 	__try {
 		PIMAGE_DOS_HEADER dos_hdr = (PIMAGE_DOS_HEADER)base;
@@ -218,7 +218,7 @@ Arguments:
 Return:
 	BOOL
 --*/
-UNONE_API bool PeRegionValid(CHAR *base, PVOID va, DWORD size /*= 0*/)
+bool PeRegionValid(CHAR *base, PVOID va, DWORD size /*= 0*/)
 {
 	DWORD image_size = PeGetImageSize(base);
 	return (IN_RANGE((CHAR*)va, base, image_size)) && (IN_RANGE((CHAR*)va + size, base, image_size));
@@ -232,7 +232,7 @@ Arguments:
 Return:
 	BOOL
 --*/
-UNONE_API bool PeX64(__in CHAR *base)
+bool PeX64(__in CHAR *base)
 {
 	return PE_OPT_HEADER(base)->Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC;
 }
@@ -245,7 +245,7 @@ Arguments:
 Return:
 	time stamp
 --*/
-UNONE_API DWORD PeGetTimeStamp(__in CHAR *base)
+DWORD PeGetTimeStamp(__in CHAR *base)
 {
 	if (!PeValid(base)) return 0;
 	return PE_NT_HEADER(base)->FileHeader.TimeDateStamp;
@@ -259,7 +259,7 @@ Arguments:
 Return:
 	image size
 --*/
-UNONE_API DWORD PeGetImageSize(__in CHAR *base)
+DWORD PeGetImageSize(__in CHAR *base)
 {
 	if (!PeValid(base)) return 0;
 	if (PE_X64(base))
@@ -276,7 +276,7 @@ Arguments:
 Return:
 	entry point
 --*/
-UNONE_API DWORD PeGetEntryPoint(__in CHAR *base)
+DWORD PeGetEntryPoint(__in CHAR *base)
 {
 	if (!PeValid(base)) return 0;
 	if (PE_X64(base))
@@ -295,7 +295,7 @@ Arguments:
 Return:
 	directory
 --*/
-UNONE_API PIMAGE_DATA_DIRECTORY PeGetDataDirectory(__in DWORD idx, __in CHAR *base, __in UNONE::PE_BASE_TYPE base_type /*= BASE_IMAGE*/)
+PIMAGE_DATA_DIRECTORY PeGetDataDirectory(__in DWORD idx, __in CHAR *base, __in UNONE::PE_BASE_TYPE base_type /*= BASE_IMAGE*/)
 {
 	if (!PeValid(base)) return NULL;
 	DWORD rva = 0;
@@ -317,7 +317,7 @@ Arguments:
 Return:
 	entity
 --*/
-UNONE_API CHAR* PeGetDataEntity(__in DWORD idx, __in CHAR *base, __in UNONE::PE_BASE_TYPE base_type /*= BASE_IMAGE*/)
+CHAR* PeGetDataEntity(__in DWORD idx, __in CHAR *base, __in UNONE::PE_BASE_TYPE base_type /*= BASE_IMAGE*/)
 {
 	PIMAGE_DATA_DIRECTORY dir = PeGetDataDirectory(idx, base, base_type);
 	if (!dir) return NULL;
@@ -345,7 +345,7 @@ Arguments:
 Return:
 	entity
 --*/
-UNONE_API CHAR* PeGetDataEntityByDir(__in PIMAGE_DATA_DIRECTORY dir, __in CHAR *base, __in UNONE::PE_BASE_TYPE base_type /*= BASE_IMAGE*/)
+CHAR* PeGetDataEntityByDir(__in PIMAGE_DATA_DIRECTORY dir, __in CHAR *base, __in UNONE::PE_BASE_TYPE base_type /*= BASE_IMAGE*/)
 {
 	if (!dir) return NULL;
 
@@ -368,7 +368,7 @@ Arguments:
 Return:
 	entity
 --*/
-UNONE_API std::string PeGetPdb(__in CHAR *base, __in UNONE::PE_BASE_TYPE base_type /*= BASE_IMAGE*/)
+std::string PeGetPdb(__in CHAR *base, __in UNONE::PE_BASE_TYPE base_type /*= BASE_IMAGE*/)
 {
 	PIMAGE_DEBUG_DIRECTORY dbg = (PIMAGE_DEBUG_DIRECTORY)
 		PeGetDataEntity(IMAGE_DIRECTORY_ENTRY_DEBUG, base, base_type);
@@ -431,7 +431,7 @@ Arguments:
 Return:
 	function address
 --*/
-UNONE_API PVOID PeGetProcAddress(CHAR *base, CHAR* proc_name, __in UNONE::PE_BASE_TYPE base_type /*= BASE_IMAGE*/)
+PVOID PeGetProcAddress(CHAR *base, CHAR* proc_name, __in UNONE::PE_BASE_TYPE base_type /*= BASE_IMAGE*/)
 {
 	PVOID func_addr = NULL;
 

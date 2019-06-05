@@ -41,7 +41,7 @@ ULONG64 GetLoadLibraryAddress32(DWORD pid)
 		return NULL;
 	}
 	ULONG64 base = it->DllBase;
-	std::wstring& path = it->FullDllName;
+	auto &&path = UNONE::OsSyswow64DirW() + L"\\kernel32.dll";
 	auto image = UNONE::PeMapImageByPathW(path);
 	if (!image) {
 		UNONE_ERROR("MapImage %s failed, err:%d", path.c_str(), GetLastError());

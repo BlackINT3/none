@@ -17,7 +17,5 @@
 #include "../common/common.h"
 
 namespace FileOps {
-
-	bool FsCopyDirectoryW(const std::wstring &src, const std::wstring &dst);
 	void CopyFilePattern(const std::wstring &src, const std::wstring &dst);
 }
