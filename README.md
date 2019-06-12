@@ -2,11 +2,11 @@
 
 ### Introduction
 
-UNONE is a open source base library that makes it easy to develop software on Windows. It aimmed at programming, reversing, diving into Windows internal, and evolving into reliable and maintainable project.
+UNONE and KNONE is a couple of open source base library that makes it easy to develop software on Windows. It aimmed at programming, reversing, diving into Windows internal, and evolving into reliable and maintainable project.
 
 ### Architecture
 
-![image](doc/arch/unone-arch.png)
+![image](doc/arch/none-arch.png)
 
 * Str - String wrapper
 * Os - System environment
@@ -25,10 +25,10 @@ UNONE is a open source base library that makes it easy to develop software on Wi
 
 ### How to use ?
 Use nuget package
-* Install by disk: Open console (View - Other Windows - Package Manager Conosle), Install-Package C:\vs2015-unone.1.0.0.nupkg
+* Install by disk: Open console (eg: View - Other Windows - Package Manager Conosle), Install-Package C:\vs2015-unone.1.0.0.nupkg
 * Install by server: Set Nuget sources url (Tools - Options - Nuget Package Manager - Package Sources)
-* Uninstall: Uninstall-Package vs2015-unone
-* BTW: Nuget must be installed manualy in Visual Studio 2010.
+* Uninstall: eg: Uninstall-Package vs2015-unone
+* BTW: Nuget addons must be installed manualy in Visual Studio 2010.
 
 Use libs or dlls
 * Include headers and libs/dlls, then build it.
@@ -38,10 +38,10 @@ Use libs or dlls
 
 ### Distributions
 * Binaray (lib/dll/package)
-  * static lib 32/64 bit
-  * dynamic lib 32/64 bit
-  * dynamic dll 32/64 bit
-  * .nupkg
+  * static lib 32/64 bit (UNONE)
+  * dynamic lib 32/64 bit (UNONE/KNONE)
+  * dynamic dll 32/64 bit ((UNONE))
+  * .nupkg (UNONE/KNONE)
 * Package Manager
   * [Nuget](https://docs.microsoft.com/en-us/nuget/)
   * [CoApp](http://coapp.org/)
