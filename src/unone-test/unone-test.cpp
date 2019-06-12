@@ -37,8 +37,7 @@ int MiniTest(int argc, char* argv[])
 	//add mini code test
 	//
 
-	__debugbreak();
-	UNONE::PsInjectByRemoteThreadW(atoi(argv[1]), L"C:\\Users\\Administrator\\Desktop\\my_dll.dll");
+	UNONE::PsInjectByRemoteThreadW(9808, LR"("I:\demo\inject - demo64.dll")");
 
 	std::cin >> argc;
 	return 0;

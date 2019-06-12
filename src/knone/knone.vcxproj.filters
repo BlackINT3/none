@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="common">
+      <UniqueIdentifier>{6cbd8cce-26dc-47cd-86bf-429cf48c3c92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="file">
+      <UniqueIdentifier>{d87e4405-f747-4dbf-b9b5-fe925c1e8709}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="internal">
+      <UniqueIdentifier>{5ddf4f0e-ece7-42c7-917e-49484c35aee9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="process">
+      <UniqueIdentifier>{45bf1b68-f7a5-4151-8115-7355848be7c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="os">
+      <UniqueIdentifier>{6399cc24-503d-4200-acec-80d35a6bf407}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="string">
+      <UniqueIdentifier>{aea5ad59-f13f-4213-974e-79ddc51a50ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="object">
+      <UniqueIdentifier>{d5a0d4ed-d706-4616-b023-07208979147f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="native">
+      <UniqueIdentifier>{282e5a40-2ef0-44bf-b072-011e94ef90b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="memory">
+      <UniqueIdentifier>{73b5370b-bd81-4c56-9ace-eef30c37d51b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="time">
+      <UniqueIdentifier>{c878cbca-1eb6-4b32-be58-402fb266a29b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="knone.cpp" />
+    <ClCompile Include="internal\knone-internal.cpp">
+      <Filter>internal</Filter>
+    </ClCompile>
+    <ClCompile Include="common\knone-common.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="os\knone-os.cpp">
+      <Filter>os</Filter>
+    </ClCompile>
+    <ClCompile Include="native\knone-native.cpp">
+      <Filter>native</Filter>
+    </ClCompile>
+    <ClCompile Include="file\knone-fs.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="memory\knone-mm.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="time\knone-tm.cpp">
+      <Filter>time</Filter>
+    </ClCompile>
+    <ClCompile Include="object\knone-ob.cpp">
+      <Filter>object</Filter>
+    </ClCompile>
+    <ClCompile Include="process\knone-ps.cpp">
+      <Filter>process</Filter>
+    </ClCompile>
+    <ClCompile Include="string\knone-str.cpp">
+      <Filter>string</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="knone.h" />
+    <ClInclude Include="native\knone-native.h">
+      <Filter>native</Filter>
+    </ClInclude>
+    <ClInclude Include="internal\knone-internal.h">
+      <Filter>internal</Filter>
+    </ClInclude>
+    <ClInclude Include="common\knone-common.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="os\knone-os.h">
+      <Filter>os</Filter>
+    </ClInclude>
+    <ClInclude Include="file\knone-fs.h">
+      <Filter>file</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\knone-mm.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="time\knone-tm.h">
+      <Filter>time</Filter>
+    </ClInclude>
+    <ClInclude Include="object\knone-ob.h">
+      <Filter>object</Filter>
+    </ClInclude>
+    <ClInclude Include="process\knone-ps.h">
+      <Filter>process</Filter>
+    </ClInclude>
+    <ClInclude Include="string\knone-str.h">
+      <Filter>string</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -37,8 +37,8 @@ echo.
 echo [+] Copy header files completed...
 
 echo.
-xcopy /E /Y  "%DEST_DIR%"\bin\*.lib  "%DEST_DIR%"\unone
-xcopy /E /Y  "%DEST_DIR%"\bin\*.dll  "%DEST_DIR%"\unone
+xcopy /E /Y  "%DEST_DIR%"\bin\*unone*.lib  "%DEST_DIR%"\unone
+xcopy /E /Y  "%DEST_DIR%"\bin\*unone*.dll  "%DEST_DIR%"\unone
 echo.
 echo [+] Copy all files completed...
 
