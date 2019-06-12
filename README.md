@@ -19,7 +19,7 @@ UNONE and KNONE is a couple of open source base library that makes it easy to de
 * Pe - PE Parser
 * Net - Network utility
 * Reg - Registry
-* Int - UNONE internals
+* Int - Internal features
 * Native - Windows Native structures, types, undocument API and more
 * Plugins - 3rd-library and wrapper and unone-based componments
 
