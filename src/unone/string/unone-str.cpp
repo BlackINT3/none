@@ -18,8 +18,8 @@
 #include <vector>
 #include <algorithm>
 #include <Windows.h>
-#include "../common/unone-common.h"
-#include "../internal/unone-internal.h"
+#include <common/unone-common.h>
+#include <internal/unone-internal.h>
 #include "unone-str.h"
 
 namespace {

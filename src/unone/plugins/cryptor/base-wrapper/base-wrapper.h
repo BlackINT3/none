@@ -14,9 +14,16 @@
 **
 ****************************************************************************/
 #pragma once
+#include <string>
 
-#include "cryptor/md-wrapper/md-wrapper.h"
-#include "cryptor/sha-wrapper/sha-wrapper.h"
-#include "cryptor/crc-wrapper/crc-wrapper.h"
-#include "cryptor/base-wrapper/base-wrapper.h"
-#include "cryptor/rc-wrapper/rc-wrapper.h"
+namespace UNONE {
+namespace Plugins {
+namespace Cryptor {
+
+std::string Base64Encode(unsigned char const* bytes_to_encode, unsigned int in_len);
+std::string Base64Encode(const std::string &bytes_to_encode);
+std::string Base64Decode(const std::string &encoded_string);
+
+} // namespace Cryptor
+} // namespace Plugins
+} // namespace UNONE

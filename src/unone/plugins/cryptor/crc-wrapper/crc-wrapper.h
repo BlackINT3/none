@@ -14,9 +14,18 @@
 **
 ****************************************************************************/
 #pragma once
+#include <string>
 
-#include "cryptor/md-wrapper/md-wrapper.h"
-#include "cryptor/sha-wrapper/sha-wrapper.h"
-#include "cryptor/crc-wrapper/crc-wrapper.h"
-#include "cryptor/base-wrapper/base-wrapper.h"
-#include "cryptor/rc-wrapper/rc-wrapper.h"
+namespace UNONE {
+namespace Plugins {
+namespace Cryptor {
+
+#define CRC32_HASH_SIZE 4
+
+uint32_t GetCRC32ByData(__in const void *buf, __in size_t size, __in uint32_t init_crc = 0);
+uint32_t GetCRC32ByData(__in const std::string &buf, __in uint32_t init_crc = 0);
+uint32_t GetCRC32ByFile(__in const std::string &file, __in uint32_t init_crc = 0);
+
+} // namespace Cryptor
+} // namespace Plugins
+} // namespace UNONE

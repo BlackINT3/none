@@ -29,9 +29,14 @@ call unone-tool.exe -copy-file %CORE_DIR%/security/unone-se.h %COPY_PATTERN%
 call unone-tool.exe -copy-file %CORE_DIR%/time/unone-tm.h %COPY_PATTERN%
 call unone-tool.exe -copy-file %CORE_DIR%/network/unone-net.h %COPY_PATTERN%
 call unone-tool.exe -copy-file %CORE_DIR%/registry/unone-reg.h %COPY_PATTERN%
-call unone-tool.exe -copy-file %CORE_DIR%/plugins/unone-plugins.h %COPY_PATTERN%
 
-::Plugin Library
+::Plugins Library
+call unone-tool.exe -copy-file %PLUGINS_DIR%/unone-plugins.h %COPY_PATTERN%
+call unone-tool.exe -copy-file %PLUGINS_DIR%/cryptor/md-wrapper/md-wrapper.h %COPY_PATTERN%
+call unone-tool.exe -copy-file %PLUGINS_DIR%/cryptor/sha-wrapper/sha-wrapper.h %COPY_PATTERN%
+call unone-tool.exe -copy-file %PLUGINS_DIR%/cryptor/crc-wrapper/crc-wrapper.h %COPY_PATTERN%
+call unone-tool.exe -copy-file %PLUGINS_DIR%/cryptor/base-wrapper/base-wrapper.h %COPY_PATTERN%
+call unone-tool.exe -copy-file %PLUGINS_DIR%/cryptor/rc-wrapper/rc-wrapper.h %COPY_PATTERN%
 
 echo.
 echo [+] Copy header files completed...

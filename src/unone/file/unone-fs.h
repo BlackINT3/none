@@ -25,6 +25,7 @@ namespace UNONE {
 #ifdef _UNICODE
 #define FsGetFileSize FsGetFileSizeW
 #define FsReadFileData FsReadFileDataW
+#define FsReadFileBlock FsReadFileBlockW
 #define FsWriteFileData FsWriteFileDataW
 #define FsPathToName FsPathToNameW
 #define FsPathToDir FsPathToDirW
@@ -41,6 +42,7 @@ namespace UNONE {
 #else
 #define FsGetFileSize FsGetFileSizeA
 #define FsReadFileData FsReadFileDataA
+#define FsReadFileBlock FsReadFileBlockA
 #define FsWriteFileData FsWriteFileDataA
 #define FsInsertFileData FsInsertFileDataA
 #define FsPathToName FsPathToNameA
@@ -57,15 +59,18 @@ namespace UNONE {
 #define FsCopyDirectory FsCopyDirectoryA
 #endif // _UNICODE
 
-typedef std::function<bool(char* path, char* name, void* param)> FileCallbackA;
-typedef std::function<bool(wchar_t* path, wchar_t* name, void* param)> FileCallbackW;
+typedef std::function<bool(__in char* path, __in char* name, __in void* param)> DirEnumCallbackA;
+typedef std::function<bool(__in wchar_t* path, __in wchar_t* name, __in void* param)> DirEnumCallbackW;
+typedef std::function<bool(__in const std::string &blk)> ReadBlockCallback;
 
 UNONE_API bool FsDisableRedirection(__out PVOID& old_value);
 UNONE_API bool FsEnableRedirection(__in PVOID& old_value);
 UNONE_API bool FsGetFileSizeA(__in const std::string& fpath, __out DWORD64& fsize);
 UNONE_API bool FsGetFileSizeW(__in const std::wstring& fpath, __out DWORD64& fsize);
-UNONE_API bool FsReadFileDataA(__in const std::string& fpath, __out std::string& fdata);
-UNONE_API bool FsReadFileDataW(__in const std::wstring& fpath, __out std::string& fdata);
+UNONE_API bool FsReadFileDataA(__in const std::string &fpath, __out std::string &fdata);
+UNONE_API bool FsReadFileDataW(__in const std::wstring &fpath, __out std::string &fdata);
+UNONE_API bool FsReadFileBlockA(__in const std::string &fpath, __in int blk_size, __in ReadBlockCallback callback);
+UNONE_API bool FsReadFileBlockW(__in const std::wstring &fpath, __in int blk_size, __in ReadBlockCallback callback);
 UNONE_API bool FsWriteFileDataA(__in const std::string& fpath, __in const std::string& fdata);
 UNONE_API bool FsWriteFileDataW(__in const std::wstring& fpath, __in const std::string& fdata);
 UNONE_API bool FsInsertFileDataA(__in const std::string& fpath, __in std::string fdata, __in size_t pos = -1);
@@ -100,8 +105,8 @@ UNONE_API LONGLONG FsGetFileModifyTimeW(__in const std::wstring& path);
 UNONE_API bool FsGetFileTimeA(__in const std::string& path, __inout LONGLONG* create_tm, __inout LONGLONG* access_tm, __inout LONGLONG* modify_tm);
 UNONE_API bool FsGetFileTimeW(__in const std::wstring& path, __inout LONGLONG* create_tm, __inout LONGLONG* access_tm, __inout LONGLONG* modify_tm);
 
-UNONE_API bool FsEnumDirectoryA(__in const std::string& dir, __inout FileCallbackA callback, __in void* param = nullptr);
-UNONE_API bool FsEnumDirectoryW(__in const std::wstring& dir, __inout FileCallbackW callback, __in void* param = nullptr);
+UNONE_API bool FsEnumDirectoryA(__in const std::string& dir, __inout DirEnumCallbackA callback, __in void* param = nullptr);
+UNONE_API bool FsEnumDirectoryW(__in const std::wstring& dir, __inout DirEnumCallbackW callback, __in void* param = nullptr);
 UNONE_API bool FsCreateDirA(const std::string& dir);
 UNONE_API bool FsCreateDirW(const std::wstring& dir);
 UNONE_API bool FsCopyA(const std::string &src, const std::string &dst);

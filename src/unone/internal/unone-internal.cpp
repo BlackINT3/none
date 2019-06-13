@@ -16,8 +16,8 @@
 #include <Windows.h>
 #include <stack>
 #include "unone-internal.h"
-#include "../common/unone-common.h"
-#include "../string/unone-str.h"
+#include <common/unone-common.h>
+#include <string/unone-str.h>
 
 namespace UNONE {
 typedef std::stack<LogCallback> LoggerType;

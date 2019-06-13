@@ -14,9 +14,18 @@
 **
 ****************************************************************************/
 #pragma once
+#include <string>
 
-#include "cryptor/md-wrapper/md-wrapper.h"
-#include "cryptor/sha-wrapper/sha-wrapper.h"
-#include "cryptor/crc-wrapper/crc-wrapper.h"
-#include "cryptor/base-wrapper/base-wrapper.h"
-#include "cryptor/rc-wrapper/rc-wrapper.h"
+namespace UNONE {
+namespace Plugins {
+namespace Cryptor {
+	
+#define SHA1_HASH_SIZE 20
+
+void GetSHA1ByData(__in const char *buf, __in unsigned int size, __out char *hash);
+std::string GetSHA1ByData(__in const std::string &buf);
+std::string GetSHA1ByFile(__in const std::string &file);
+
+} // namespace Cryptor
+} // namespace Plugins
+} // namespace UNONE

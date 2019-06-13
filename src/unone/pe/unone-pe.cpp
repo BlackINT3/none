@@ -14,11 +14,11 @@
 **
 ****************************************************************************/
 #include <Windows.h>
-#include "../common/unone-common.h"
-#include "../native/unone-native.h"
-#include "../internal/unone-internal.h"
-#include "../string/unone-str.h"
-#include "../memory/unone-mm.h"
+#include <common/unone-common.h>
+#include <native/unone-native.h>
+#include <internal/unone-internal.h>
+#include <string/unone-str.h>
+#include <memory/unone-mm.h>
 #include "unone-pe.h"
 
 namespace UNONE {

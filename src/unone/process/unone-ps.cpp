@@ -19,10 +19,10 @@
 #include <tchar.h>
 #include <algorithm>
 #pragma comment(lib, "Psapi.lib")
-#include "../common/unone-common.h"
-#include "../native/unone-native.h"
-#include "../internal/unone-internal.h"
-#include "../string/unone-str.h"
+#include <common/unone-common.h>
+#include <native/unone-native.h>
+#include <internal/unone-internal.h>
+#include <string/unone-str.h>
 #include "../os/unone-os.h"
 #include "../file/unone-fs.h"
 #include "../object/unone-ob.h"

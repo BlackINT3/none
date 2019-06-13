@@ -14,17 +14,17 @@
 **
 ****************************************************************************/
 #include <Windows.h>
-#include "../common/unone-common.h"
-#include "../native/unone-native.h"
-#include "../internal/unone-internal.h"
-#include "../string/unone-str.h"
+#include <common/unone-common.h>
+#include <native/unone-native.h>
+#include <internal/unone-internal.h>
+#include <string/unone-str.h>
 #include "unone-mm.h"
 
 namespace UNONE {
 
 /*++
 Description:
-	map file to section, if successed, caller should close handles(MmUnmapFile).
+	map file to section, if succeeded, caller should close handles(MmUnmapFile).
 Arguments:
 	path - file path
 	size - file size
@@ -40,7 +40,7 @@ CHAR* MmMapFileA(__in const std::string& path, __out DWORD& size, __out HANDLE& 
 
 /*++
 Description:
-	map file to section, if successed, caller should close handles(MmUnmapFile).
+	map file to section, if succeeded, caller should close handles(MmUnmapFile).
 Arguments:
 	path - file path
 	size - file size
@@ -89,7 +89,7 @@ CHAR* MmMapFileW(__in const std::wstring& path, __out DWORD& size, __out HANDLE&
 
 /*++
 Description:
-	map file to section, if successed, caller should closehandle.
+	map file to section, if succeeded, caller should closehandle.
 Arguments:
 	map_buff - file path
 	fd - file size

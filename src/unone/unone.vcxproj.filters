@@ -52,6 +52,24 @@
     <Filter Include="internal">
       <UniqueIdentifier>{dc796699-ca94-4b73-94df-5522f8562162}</UniqueIdentifier>
     </Filter>
+    <Filter Include="plugins\cryptor">
+      <UniqueIdentifier>{59334921-ded7-4e34-b743-dc9779649ca5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="plugins\cryptor\sha-wrapper">
+      <UniqueIdentifier>{00098c7b-bce9-4b47-83f4-c0ab17d7df15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="plugins\cryptor\crc-wrapper">
+      <UniqueIdentifier>{dca48eb3-63bf-48e5-aa47-d4706f540928}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="plugins\cryptor\md-wrapper">
+      <UniqueIdentifier>{d4e0e80d-392d-414f-9752-9ccea0068d76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="plugins\cryptor\base-wrapper">
+      <UniqueIdentifier>{9fd63477-839d-4444-a88f-1b214cd1dc82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="plugins\cryptor\rc-wrapper">
+      <UniqueIdentifier>{82ee1229-7c14-4f41-9a46-092f16807309}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="unone.cpp" />
@@ -102,6 +120,33 @@
     </ClCompile>
     <ClCompile Include="common\unone-common.cpp">
       <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="plugins\unone-plugins.cpp">
+      <Filter>plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="plugins\cryptor\sha-wrapper\sha1c.c">
+      <Filter>plugins\cryptor\sha-wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="plugins\cryptor\sha-wrapper\sha-wrapper.cpp">
+      <Filter>plugins\cryptor\sha-wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="plugins\cryptor\crc-wrapper\crc-wrapper.cpp">
+      <Filter>plugins\cryptor\crc-wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="plugins\cryptor\md-wrapper\md5c.c">
+      <Filter>plugins\cryptor\md-wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="plugins\cryptor\md-wrapper\md-wrapper.cpp">
+      <Filter>plugins\cryptor\md-wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="plugins\cryptor\rc-wrapper\rc4.cpp">
+      <Filter>plugins\cryptor\rc-wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="plugins\cryptor\rc-wrapper\rc-wrapper.cpp">
+      <Filter>plugins\cryptor\rc-wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="plugins\cryptor\base-wrapper\base-wrapper.cpp">
+      <Filter>plugins\cryptor\base-wrapper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -162,6 +207,30 @@
     </ClInclude>
     <ClInclude Include="internal\unone-internal.h">
       <Filter>internal</Filter>
+    </ClInclude>
+    <ClInclude Include="plugins\cryptor\sha-wrapper\sha1c.h">
+      <Filter>plugins\cryptor\sha-wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="plugins\cryptor\sha-wrapper\sha-wrapper.h">
+      <Filter>plugins\cryptor\sha-wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="plugins\cryptor\crc-wrapper\crc-wrapper.h">
+      <Filter>plugins\cryptor\crc-wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="plugins\cryptor\md-wrapper\md5c.h">
+      <Filter>plugins\cryptor\md-wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="plugins\cryptor\md-wrapper\md-wrapper.h">
+      <Filter>plugins\cryptor\md-wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="plugins\cryptor\rc-wrapper\rc4.h">
+      <Filter>plugins\cryptor\rc-wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="plugins\cryptor\rc-wrapper\rc-wrapper.h">
+      <Filter>plugins\cryptor\rc-wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="plugins\cryptor\base-wrapper\base-wrapper.h">
+      <Filter>plugins\cryptor\base-wrapper</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

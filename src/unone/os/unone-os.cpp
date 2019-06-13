@@ -18,10 +18,10 @@
 #include <memory>
 #include <WtsApi32.h>
 #pragma comment(lib, "WtsApi32.lib")
-#include "../common/unone-common.h"
-#include "../native/unone-native.h"
-#include "../internal/unone-internal.h"
-#include "../string/unone-str.h"
+#include <common/unone-common.h>
+#include <native/unone-native.h>
+#include <internal/unone-internal.h>
+#include <string/unone-str.h>
 #include "unone-os.h"
 
 namespace {

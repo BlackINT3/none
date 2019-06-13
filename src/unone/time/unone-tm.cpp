@@ -16,9 +16,9 @@
 #ifndef _CRT_RAND_S
 #define _CRT_RAND_S
 #endif
-#include "../common/unone-common.h"
-#include "../internal/unone-internal.h"
-#include "../string/unone-str.h"
+#include <common/unone-common.h>
+#include <internal/unone-internal.h>
+#include <string/unone-str.h>
 #include "unone-tm.h"
 #include <tchar.h>
 

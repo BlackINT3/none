@@ -15,10 +15,10 @@
 ****************************************************************************/
 #include <Ws2tcpip.h>
 #include <Windows.h>
-#include "../common/unone-common.h"
-#include "../native/unone-native.h"
-#include "../internal/unone-internal.h"
-#include "../string/unone-str.h"
+#include <common/unone-common.h>
+#include <native/unone-native.h>
+#include <internal/unone-internal.h>
+#include <string/unone-str.h>
 #include "unone-net.h"
 
 #pragma comment(lib, "Ws2_32.lib")

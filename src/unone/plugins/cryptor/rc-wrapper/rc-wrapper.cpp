@@ -13,10 +13,45 @@
 ** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 **
 ****************************************************************************/
-#pragma once
+#include "rc-wrapper.h"
+#include "rc4.h"
+#include <unone.h>
 
-#include "cryptor/md-wrapper/md-wrapper.h"
-#include "cryptor/sha-wrapper/sha-wrapper.h"
-#include "cryptor/crc-wrapper/crc-wrapper.h"
-#include "cryptor/base-wrapper/base-wrapper.h"
-#include "cryptor/rc-wrapper/rc-wrapper.h"
+namespace UNONE {
+namespace Plugins {
+namespace Cryptor {
+
+/*++
+Description:
+	rc4 decrypt or encrypt
+Arguments:
+	key - key
+	buffer - buffer
+	bufsize - buffer size
+Return:
+	bool
+--*/
+bool RC4(__in char *key, __inout unsigned char *buffer, __in int bufsize)
+{
+	rc4_key key_impl;
+	prepare_key(key, &key_impl);
+	rc4_impl(buffer, bufsize, &key_impl);
+	return true;
+}
+/*++
+Description:
+	rc4 decrypt or encrypt
+Arguments:
+	key - key
+	data - buffer
+Return:
+	bool
+--*/
+bool RC4(__in const std::string &key, __inout std::string &data)
+{
+	return RC4((char*)key.c_str(), (unsigned char*)data.c_str(), (int)data.size());
+}
+
+} // namespace Cryptor
+} // namespace Plugins
+} // namespace UNONE

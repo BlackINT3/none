@@ -13,10 +13,10 @@
 ** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 **
 ****************************************************************************/
-#include "../common/unone-common.h"
-#include "../internal/unone-internal.h"
-#include "../string/unone-str.h"
-#include "../time/unone-tm.h"
+#include <common/unone-common.h>
+#include <internal/unone-internal.h>
+#include <string/unone-str.h>
+#include <time/unone-tm.h>
 #include "unone-fs.h"
 #include <tchar.h>
 
@@ -162,7 +162,7 @@ Arguments:
 Return:
 	bool
 --*/
-bool FsReadFileDataA(__in const std::string& fpath, __out std::string& fdata)
+bool FsReadFileDataA(__in const std::string &fpath, __out std::string &fdata)
 {
 	return FsReadFileDataW(StrToW(fpath), fdata);
 }
@@ -176,7 +176,7 @@ Arguments:
 Return:
 	bool
 --*/
-bool FsReadFileDataW(__in const std::wstring& fpath, __out std::string& fdata)
+bool FsReadFileDataW(__in const std::wstring &fpath, __out std::string &fdata)
 {
 	bool result = false;
 	DWORD fsize = 0;
@@ -222,6 +222,76 @@ bool FsReadFileDataW(__in const std::wstring& fpath, __out std::string& fdata)
 		UNONE_ERROR(L"ReadFile %s err:%d", fpath.c_str(), GetLastError());
 	}
 	delete[] buff;
+	CloseHandle(fd);
+	return result;
+}
+
+/*++
+Description:
+	read file block one by one to callback.
+Arguments:
+	fpath - file path
+	blk_size - block size
+	callback - block callback, receive file data
+Return:
+	bool
+--*/
+bool FsReadFileBlockA(__in const std::string &fpath, __in int blk_size, __in ReadBlockCallback callback)
+{
+	return FsReadFileBlockW(StrToW(fpath), blk_size, callback);
+}
+
+/*++
+Description:
+	read file block one by one to callback.
+Arguments:
+	fpath - file path
+	blk_size - block size
+	callback - block callback, receive file data
+Return:
+	bool
+--*/
+bool FsReadFileBlockW(__in const std::wstring &fpath, __in int blk_size, __in ReadBlockCallback callback)
+{
+	bool result = true;
+	HANDLE fd = CreateFileW(fpath.c_str(), GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+	if (fd == INVALID_HANDLE_VALUE) {
+		UNONE_ERROR(L"CreateFileW %s err:%d", fpath.c_str(), GetLastError());
+		return false;
+	}
+	LARGE_INTEGER li;
+	if (!GetFileSizeEx(fd, &li)) {
+		UNONE_ERROR(L"GetFileSize %s err:%d", fpath.c_str(), GetLastError());
+		CloseHandle(fd);
+		return false;
+	}
+	auto fsize = li.QuadPart;
+	if (fsize == 0) {
+		UNONE_WARN(L"%s is empty file", fpath.c_str());
+		CloseHandle(fd);
+		return true;
+	}
+	std::string blk;
+	do {
+		if (fsize <= 0) break;
+		blk_size = MIN(blk_size, fsize);
+		blk.resize(blk_size);
+		DWORD readlen;
+		if (!ReadFile(fd, (char*)blk.data(), blk_size, &readlen, NULL)) {
+			UNONE_ERROR(L"ReadFile %s err:%d", fpath.c_str(), GetLastError());
+			result = false;
+			break;
+		}
+		if (readlen != blk_size) {
+			UNONE_ERROR(L"ReadFile %s err, expected-size:%d actual-size:%d", fpath.c_str(), blk_size, readlen);
+			result = false;
+			break;
+		}
+		if (!callback(blk)) {
+			break;
+		}
+		fsize -= blk_size;
+	} while (1);
 	CloseHandle(fd);
 	return result;
 }
@@ -835,7 +905,7 @@ Arguments:
 Return:
 	bool
 --*/
-bool FsEnumDirectoryA(__in const std::string& dir, __inout FileCallbackA callback, __in void* param)
+bool FsEnumDirectoryA(__in const std::string& dir, __inout DirEnumCallbackA callback, __in void* param)
 {
 	return FsEnumDirectoryW(StrToW(dir), [&](wchar_t* path, wchar_t* name, void* param)->bool {
 		return callback(
@@ -855,7 +925,7 @@ Arguments:
 Return:
 	bool
 --*/
-bool FsEnumDirectoryW(__in const std::wstring& dir, __inout FileCallbackW callback, __in void* param)
+bool FsEnumDirectoryW(__in const std::wstring& dir, __inout DirEnumCallbackW callback, __in void* param)
 {
 	if (!FsIsExistedW(dir) || !FsIsDirW(dir)) return false;
 

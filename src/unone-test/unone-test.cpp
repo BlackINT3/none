@@ -37,7 +37,16 @@ int MiniTest(int argc, char* argv[])
 	//add mini code test
 	//
 
-	UNONE::PsInjectByRemoteThreadW(9808, LR"("I:\demo\inject - demo64.dll")");
+	//UNONE::PsInjectByRemoteThreadW(9808, LR"("I:\demo\inject - demo64.dll")");
+	using namespace UNONE::Plugins::Cryptor;
+
+	std::string hash;
+	hash = "123";
+	printf("%s\n", Base64Decode(Base64Encode(hash)).c_str());
+	RC4("213", hash);
+	hash = UNONE::StrStreamToHexStrA(hash);
+	printf("%s", hash.c_str());
+
 
 	std::cin >> argc;
 	return 0;

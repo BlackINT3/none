@@ -13,10 +13,4 @@
 ** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 **
 ****************************************************************************/
-#pragma once
-
-#include "cryptor/md-wrapper/md-wrapper.h"
-#include "cryptor/sha-wrapper/sha-wrapper.h"
-#include "cryptor/crc-wrapper/crc-wrapper.h"
-#include "cryptor/base-wrapper/base-wrapper.h"
-#include "cryptor/rc-wrapper/rc-wrapper.h"
+#include "unone-plugins.h"
