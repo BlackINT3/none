@@ -455,9 +455,8 @@ Return:
 std::vector<DWORD> PsGetChildPids(__in DWORD pid)
 {
 	std::vector<DWORD> childs;
-	PsEnumProcess([&](PROCESSENTRY32W &entry)->bool {
-		if (pid != entry.th32ProcessID && 
-			pid == PsGetParentPid(entry.th32ProcessID)) {
+	UNONE::PsEnumProcess([&](PROCESSENTRY32W &entry)->bool {
+		if (pid != 0 && pid == entry.th32ParentProcessID) {
 			childs.push_back(entry.th32ProcessID);
 		}
 		return true;
