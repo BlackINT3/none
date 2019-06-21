@@ -16,10 +16,9 @@
 #pragma once
 
 #define UNONE_VERSION	"1.0.0"
+#include "internal/unone-internal.h"
 
 #include "native/unone-native.h"
-
-#include "internal/unone-internal.h"
 
 #include "os/unone-os.h"
 

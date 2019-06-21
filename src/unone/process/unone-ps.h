@@ -70,10 +70,17 @@ namespace UNONE {
 #define PsInjectByRemoteThread PsInjectByRemoteThreadA
 #endif // _UNICODE
 
+typedef struct _OBJECT_TABLE_ENTRY {
+	HANDLE	HandleValue;
+	USHORT	ObjectTypeIndex;
+	ULONG	GrantedAccess;
+} OBJECT_TABLE_ENTRY, *POBJECT_TABLE_ENTRY;
 typedef std::function<bool(PROCESSENTRY32W &entry)> ProcessCallback;
 typedef std::function<bool(THREADENTRY32 &entry)> ThreadCallback;
 typedef std::function<bool(MODULEENTRY32W &entry)> ModuleCallback;
 typedef std::function<bool(HEAPENTRY32 &entry)> HeapCallback;
+typedef std::function<bool(SYSTEM_HANDLE_TABLE_ENTRY_INFO &entry)> HandleCallback;
+typedef std::function<bool(MEMORY_BASIC_INFORMATION &mbi)> MemoryCallback;
 
 typedef struct _PROCESS_BASE_INFOA {
 	std::string ImagePathName;
@@ -173,6 +180,8 @@ UNONE_API bool PsGetAllThread(__in DWORD pid, __out std::vector<DWORD> &tids);
 UNONE_API bool PsEnumProcess(__in ProcessCallback process_cb);
 UNONE_API bool PsEnumThread(__in DWORD pid, __in ThreadCallback thread_cb);
 UNONE_API bool PsEnumModule(__in DWORD pid, __in ModuleCallback module_cb);
+UNONE_API bool PsEnumHandle(__in DWORD pid, __in HandleCallback handle_cb);
+UNONE_API bool PsEnumMemory(__in DWORD pid, __in MemoryCallback memory_cb);
 
 UNONE_API bool PsKillProcess(__in DWORD pid);
 UNONE_API bool PsKillProcessNameA(__in const std::string &wild);
@@ -182,6 +191,7 @@ UNONE_API bool PsKillProcessPathW(__in const std::wstring &wild);
 UNONE_API bool PsKillProcessTree(__in DWORD pid);
 UNONE_API bool PsCreateProcessA(__in const std::string &cmdline, __in UINT cmdshow = SW_SHOW, __out PROCESS_INFORMATION *proc_info = NULL);
 UNONE_API bool PsCreateProcessW(__in const std::wstring &cmdline, __in UINT cmdshow = SW_SHOW, __out PROCESS_INFORMATION *proc_info = NULL);
+UNONE_API bool PsRestartProcess(__in DWORD pid);
 UNONE_API bool PsSuspendProcess(__in DWORD pid);
 UNONE_API bool PsResumeProcess(__in DWORD pid);
 UNONE_API DWORD PsSuspendThread(__in DWORD tid);

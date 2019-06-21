@@ -15,6 +15,8 @@
 ****************************************************************************/
 #pragma once
 #include <Windows.h>
+#include <string>
+#include "../internal/unone-internal.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -964,3 +966,9 @@ typedef VOID (NTAPI* __RtlGetNtVersionNumbers)(
 #ifdef __cplusplus
 } // extern "C"
 #endif
+
+namespace UNONE {
+
+UNONE_API NTSTATUS NtQuerySystemInfo(__in int type, __out std::string &info);
+
+};

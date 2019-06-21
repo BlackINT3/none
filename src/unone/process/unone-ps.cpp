@@ -20,12 +20,12 @@
 #include <algorithm>
 #pragma comment(lib, "Psapi.lib")
 #include <common/unone-common.h>
-#include <native/unone-native.h>
 #include <internal/unone-internal.h>
+#include <native/unone-native.h>
 #include <string/unone-str.h>
-#include "../os/unone-os.h"
-#include "../file/unone-fs.h"
-#include "../object/unone-ob.h"
+#include <os/unone-os.h>
+#include <file/unone-fs.h>
+#include <object/unone-ob.h>
 #include "unone-ps.h"
 
 namespace {
@@ -1296,7 +1296,7 @@ bool PsGetAllThread(__in DWORD pid, __out std::vector<DWORD> &tids)
 
 /*++
 Description:
-	enum process, if callback return false then enum breaked
+	enum process, if callback return false then enum aborted
 Arguments:
 	proc_cb - process callback
 Return:
@@ -1326,10 +1326,10 @@ bool PsEnumProcess(__in ProcessCallback process_cb)
 
 /*++
 Description:
-	enum thread, if callback return false then enum breaked
+	enum thread, if callback return false then enum aborted
 Arguments:
 	thread_cb - thread callback
-	pid - process id, default -1, implies all os threads
+	pid - process id, default -1, implies all threads in os
 Return:
 	bool
 --*/
@@ -1359,7 +1359,7 @@ bool PsEnumThread(__in DWORD pid, __in ThreadCallback thread_cb)
 
 /*++
 Description:
-	enum module, if callback return false then enum breaked
+	enum module, if callback return false then enum aborted
 Arguments:
 	pid - process id
 	module_cb - module callback
@@ -1389,6 +1389,65 @@ bool PsEnumModule(__in DWORD pid, __in ModuleCallback module_cb)
 			break;
 	} while (Module32NextW(snap, &entry));
 	CloseHandle(snap);
+	return true;
+}
+
+/*++
+Description:
+	enum handle, if callback return false then enum aborted
+Arguments:
+	pid - process id, if equal -1, implies all handles in os
+	handle_cb - handle callback
+Return:
+	bool
+--*/
+bool PsEnumHandle(__in DWORD pid, __in HandleCallback handle_cb)
+{
+	std::string info;
+	NTSTATUS status = NtQuerySystemInfo(SystemHandleInformation, info);
+	if (!NT_SUCCESS(status)) return false;
+
+	auto hds = (PSYSTEM_HANDLE_INFORMATION)info.data();
+	for (ULONG i = 0; i < hds->NumberOfHandles; i++) {
+		auto hd = hds->Handles[i];
+		if (pid == INVALID_PID || pid == hd.UniqueProcessId) {
+			if (!handle_cb(hd)) break;
+		}
+	}
+	return true;
+}
+
+/*++
+Description:
+	enum memory, if callback return false then enum aborted
+Arguments:
+	pid - process id, if equal -1, implies all handles in os
+	memory_cb - memory callback
+Return:
+	bool
+--*/
+bool PsEnumMemory(__in DWORD pid, __in MemoryCallback memory_cb)
+{
+	HANDLE phd = OpenProcess(PROCESS_VM_OPERATION | PROCESS_QUERY_INFORMATION, FALSE, pid);
+	if (!phd) {
+		UNONE_ERROR("OpenProcess pid:%d err:%d", pid, GetLastError());
+		return false;
+	}
+	SYSTEM_INFO sysinfo;
+	GetSystemInfo(&sysinfo);
+	char *start = (char*)sysinfo.lpMinimumApplicationAddress;
+	char *end = (char*)sysinfo.lpMaximumApplicationAddress;
+	DWORD pagesize = sysinfo.dwPageSize;
+	do {
+		MEMORY_BASIC_INFORMATION mbi;
+		if (VirtualQueryEx(phd, start, &mbi, sizeof(MEMORY_BASIC_INFORMATION))) {
+			if (!memory_cb(mbi)) break;
+			start += mbi.RegionSize;
+		}	else {
+			start += pagesize;
+		}
+	} while (start < end);
+	CloseHandle(phd);
 	return true;
 }
 
@@ -1538,6 +1597,25 @@ bool PsCreateProcessW(__in const std::wstring &cmdline, __in UINT cmdshow /*= SW
 	if (pi.hThread)
 		CloseHandle(pi.hThread);
 	return true;
+}
+
+/*++
+Description:
+	restart process, support command line
+Arguments:
+	pid - process id
+Return:
+	bool
+--*/
+bool PsRestartProcess(__in DWORD pid)
+{
+	PROCESS_BASE_INFOW info;
+	bool ret = UNONE::PsGetProcessInfoW(pid, info);
+	if (!ret) return false;
+	auto &&cmdline = info.CommandLine.empty() ? info.ImagePathName : info.CommandLine;
+	if (cmdline.empty()) return false;
+	UNONE::PsKillProcess(pid);
+	return UNONE::PsCreateProcessW(cmdline);
 }
 
 /*++

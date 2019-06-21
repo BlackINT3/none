@@ -14,11 +14,16 @@
 **
 ****************************************************************************/
 #include <Windows.h>
+#include <wintrust.h>
+#include <Softpub.h>
+#pragma comment(lib, "Crypt32.lib")
+#include <algorithm>
 #include <tchar.h>
 #include <common/unone-common.h>
 #include <native/unone-native.h>
 #include <internal/unone-internal.h>
 #include <string/unone-str.h>
+#include <os/unone-os.h>
 #include "unone-se.h"
 
 namespace {
@@ -111,6 +116,160 @@ bool OpProcessPrivilegeByNative(DWORD priv_number, PRIVILEGE_OPERATE operate_typ
 	} while (0);
 	return result;
 }
+
+bool OpSignatureInfoW(const std::wstring &file, std::vector<UNONE::CertInfoW> &infos, bool revoked_check, bool only_verify)
+{
+	#define HCATADMIN	HANDLE	
+	#define HCATINFO	HANDLE	
+	typedef struct CATALOG_INFO_ {
+		DWORD cbStruct;
+		WCHAR wszCatalogFile[MAX_PATH];
+	} CATALOG_INFO;
+	typedef BOOL(WINAPI* __CryptCATAdminAcquireContext)(HCATADMIN* phCatAdmin, const GUID* pgSubsystem, DWORD dwFlags);
+	typedef BOOL(WINAPI* __CryptCATAdminReleaseContext)(HCATADMIN catadmin, DWORD dwFlags);
+	typedef BOOL(WINAPI* __CryptCATAdminCalcHashFromFileHandle)(HANDLE File, DWORD* pcbHash, BYTE* pbHash, DWORD dwFlags);
+	typedef HCATINFO(WINAPI* __CryptCATAdminEnumCatalogFromHash)(HCATADMIN catadmin, BYTE* pbHash, DWORD cbHash, DWORD dwFlags, HCATINFO* phPrevCatInfo);
+	typedef BOOL(WINAPI* __CryptCATAdminReleaseCatalogContext)(HCATADMIN catadmin, HCATINFO CatInfo, DWORD dwFlags);
+	typedef BOOL(WINAPI* __CryptCATCatalogInfoFromContext)(HCATINFO CatInfo, CATALOG_INFO* psCatInfo, DWORD dwFlags);
+	typedef LONG(WINAPI* __WinVerifyTrust)(HWND hWnd, GUID* pgActionID, WINTRUST_DATA* pWinTrustData);
+	typedef CRYPT_PROVIDER_DATA* (WINAPI* __WTHelperProvDataFromStateData)(HANDLE hStateData);
+	typedef DWORD(WINAPI *__CertGetNameStringA)(PCCERT_CONTEXT pCertContext, DWORD dwType, DWORD dwFlags, void *pvTypePara, LPWSTR pszNameString, DWORD cchNameString);
+	
+	bool ret = false;
+	HMODULE wintrust = GetModuleHandleW(L"wintrust.dll");
+	if (wintrust == NULL) {
+		wintrust = LoadLibraryW(L"wintrust.dll");
+		if (wintrust == NULL) return false;
+	}
+	auto pCryptCATAdminAcquireContext = (__CryptCATAdminAcquireContext)GetProcAddress(wintrust, "CryptCATAdminAcquireContext");
+	auto pCryptCATAdminReleaseContext = (__CryptCATAdminReleaseContext)GetProcAddress(wintrust, "CryptCATAdminReleaseContext");
+	auto pCryptCATAdminCalcHashFromFileHandle = (__CryptCATAdminCalcHashFromFileHandle)GetProcAddress(wintrust, "CryptCATAdminCalcHashFromFileHandle");
+	auto pCryptCATAdminEnumCatalogFromHash = (__CryptCATAdminEnumCatalogFromHash)GetProcAddress(wintrust, "CryptCATAdminEnumCatalogFromHash");
+	auto pCryptCATAdminReleaseCatalogContext = (__CryptCATAdminReleaseCatalogContext)GetProcAddress(wintrust, "CryptCATAdminReleaseCatalogContext");
+	auto pCryptCATCatalogInfoFromContext = (__CryptCATCatalogInfoFromContext)GetProcAddress(wintrust, "CryptCATCatalogInfoFromContext");
+	auto pWinVerifyTrust = (__WinVerifyTrust)GetProcAddress(wintrust, "WinVerifyTrust");
+	auto pWTHelperProvDataFromStateData = (__WTHelperProvDataFromStateData)GetProcAddress(wintrust, "WTHelperProvDataFromStateData");
+	if (!pCryptCATAdminAcquireContext || !pCryptCATAdminReleaseContext || !pCryptCATAdminCalcHashFromFileHandle ||
+		!pCryptCATAdminEnumCatalogFromHash || !pCryptCATAdminReleaseCatalogContext || !pCryptCATCatalogInfoFromContext ||
+		!pWinVerifyTrust || !pWTHelperProvDataFromStateData) {
+		return false;
+	}
+
+	HCATADMIN catadmin = NULL;
+	if (!pCryptCATAdminAcquireContext(&catadmin, NULL, 0))
+		return false;
+
+	HANDLE fd = CreateFileW(file.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+	if (fd == INVALID_HANDLE_VALUE) {
+		UNONE_ERROR(L"CreateFileW file:%s err:%d", file.c_str(), GetLastError());
+		pCryptCATAdminReleaseContext(catadmin, 0);
+		return false;
+	}
+
+	HRESULT hr;
+	WINTRUST_DATA wd = { 0 };
+	HCATINFO catalog = NULL;
+	GUID action = WINTRUST_ACTION_GENERIC_VERIFY_V2;
+	do {
+		DWORD hsize = 64;
+		BYTE hash[64];
+		pCryptCATAdminCalcHashFromFileHandle(fd, &hsize, hash, 0);
+		CloseHandle(fd);
+
+		WINTRUST_FILE_INFO wfi = { 0 };
+		WINTRUST_CATALOG_INFO wci = { 0 };
+		CATALOG_INFO ci = { 0 };
+		catalog = pCryptCATAdminEnumCatalogFromHash(catadmin, hash, hsize, 0, NULL);
+		if (catalog == NULL) {
+			wfi.cbStruct = sizeof(WINTRUST_FILE_INFO);
+			wfi.pcwszFilePath = file.c_str();
+			wfi.hFile = NULL;
+			wfi.pgKnownSubject = NULL;
+			wd.cbStruct = sizeof(WINTRUST_DATA);
+			wd.dwUnionChoice = WTD_CHOICE_FILE;
+			wd.pFile = &wfi;
+			wd.dwUIChoice = WTD_UI_NONE;
+			wd.hWVTStateData = NULL;
+			wd.pwszURLReference = NULL;
+			wd.dwStateAction = WTD_STATEACTION_VERIFY;
+			wd.fdwRevocationChecks = WTD_REVOKE_NONE;
+			wd.dwProvFlags = revoked_check ? WTD_SAFER_FLAG : WTD_CACHE_ONLY_URL_RETRIEVAL;
+		}	else {
+			auto member_tag = UNONE::StrToW(UNONE::StrStreamToHexStrA(std::string((char*)hash, hsize)));
+			pCryptCATCatalogInfoFromContext(catalog, &ci, 0);
+			wci.cbStruct = sizeof(WINTRUST_CATALOG_INFO);
+			wci.pcwszCatalogFilePath = ci.wszCatalogFile;
+			wci.pcwszMemberFilePath = file.c_str();
+			wci.pcwszMemberTag = member_tag.c_str();
+			wci.pbCalculatedFileHash = hash;
+			wci.cbCalculatedFileHash = hsize;
+			wd.cbStruct = sizeof(WINTRUST_DATA);
+			wd.dwUnionChoice = WTD_CHOICE_CATALOG;
+			wd.pCatalog = &wci;
+			wd.dwUIChoice = WTD_UI_NONE;
+			wd.hWVTStateData = NULL;
+			wd.pwszURLReference = NULL;
+			wd.dwStateAction = WTD_STATEACTION_VERIFY;
+			wd.fdwRevocationChecks = revoked_check ? WTD_REVOKE_WHOLECHAIN : WTD_REVOKE_NONE;
+			wd.dwProvFlags = revoked_check ? 0 : WTD_CACHE_ONLY_URL_RETRIEVAL;
+		}
+
+//	[TODO] support double signatures
+//	WINTRUST_SIGNATURE_SETTINGS ss = {0};
+//	ss.cbStruct = sizeof(WINTRUST_SIGNATURE_SETTINGS);
+//	ss.dwFlags = WSS_GET_SECONDARY_SIG_COUNT | WSS_VERIFY_SPECIFIC;
+//	ss.dwIndex = 0;
+//	wd.pSignatureSettings = &ss;
+
+		hr = pWinVerifyTrust(NULL, &action, &wd);
+		ret = SUCCEEDED(hr);
+		if (!ret) SetLastError(hr);
+		if (only_verify) break;
+
+		HMODULE crypt32 = GetModuleHandleW(L"crypt32.dll");
+		if (crypt32 == NULL) {
+			crypt32 = LoadLibraryW(L"crypt32.dll");
+			if (crypt32 == NULL) break;
+		}
+		auto pCertGetNameStringW = (__CertGetNameStringA)GetProcAddress(crypt32, "CertGetNameStringW");
+		if (!pCertGetNameStringW)
+			break;
+
+		PCRYPT_PROVIDER_DATA ProviderData = pWTHelperProvDataFromStateData(wd.hWVTStateData);
+		if (ProviderData == NULL || ProviderData->pasSigners == NULL || ProviderData->pasSigners->psSigner == NULL)
+			break;
+		
+		auto signer = ProviderData->pasSigners;
+		for (; signer != NULL; signer = signer->pasCounterSigners) {
+			UNONE::CertInfoW info;
+			CRYPT_INTEGER_BLOB serial;
+			serial = signer->psSigner->SerialNumber;
+			info.sn = UNONE::StrToW(UNONE::StrStreamToHexStrA(std::string((char*)serial.pbData, serial.cbData)));
+
+			PCERT_SIMPLE_CHAIN chain = signer->pChainContext->rgpChain[0];
+			PCCERT_CONTEXT ctx = chain->rgpElement[0]->pCertContext;
+			DWORD size = pCertGetNameStringW(ctx, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, NULL, 0);
+			auto owner = new(std::nothrow) WCHAR[size];
+			if (owner) {
+				pCertGetNameStringW(ctx, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, owner, size);
+				info.owner = std::move(owner);
+				delete[] owner;
+			}
+			infos.push_back(info);
+			break;
+		}
+		ret = true;
+	} while (0);
+
+	//Free wd.hWVTStateData
+	wd.dwStateAction = WTD_STATEACTION_CLOSE;
+	hr = pWinVerifyTrust(NULL, &action, &wd);
+	if (catalog != NULL) pCryptCATAdminReleaseCatalogContext(catadmin, catalog, 0);
+	pCryptCATAdminReleaseContext(catadmin, 0);
+
+	return ret;
+}
+
 }
 
 namespace UNONE {
@@ -209,5 +368,110 @@ bool SeDisableDebugPrivilege(__in bool natived)
 	else
 		return SeDisablePrivilege(SE_DEBUG_NAME);
 }
+
+/*++
+Description:
+	verify signature, if verify ok, return true, vice versa.
+Arguments:
+	file - file path
+	revoked_check - revocation check
+Return:
+	bool
+--*/
+bool SeVerifyCertA(__in const std::string &file, __in bool revoked_check)
+{
+	return SeVerifyCertW(StrToW(file), revoked_check);
+}
+
+/*++
+Description:
+	verify signature, if verify ok, return true, vice versa.
+Arguments:
+	file - file path
+	revoked_check - revocation check
+Return:
+	bool
+--*/
+bool SeVerifyCertW(__in const std::wstring &file, __in bool revoked_check)
+{
+	std::vector<UNONE::CertInfoW> infos;
+	return OpSignatureInfoW(file, infos, revoked_check, true);
+}
+
+/*++
+Description:
+	verify Microsoft signature, if verify ok, return true, vice versa.
+Arguments:
+	file - file path
+	revoked_check - revocation check
+Return:
+	bool
+--*/
+bool SeVerifyMicrosoftCertA(__in const std::string &file, __in bool revoked_check)
+{
+	return SeVerifyMicrosoftCertW(StrToW(file), revoked_check);
+}
+
+/*++
+Description:
+	verify Microsoft signature, if verify ok, return true, vice versa.
+Arguments:
+	file - file path
+	revoked_check - revocation check
+Return:
+	bool
+--*/
+bool SeVerifyMicrosoftCertW(__in const std::wstring &file, __in bool revoked_check)
+{
+	std::vector<UNONE::CertInfoW> infos;
+	auto ret = SeGetCertInfoW(file, infos, revoked_check);
+	if (!ret)	return false;
+	for (auto it = infos.begin(); it != infos.end(); it++) {
+		if (UNONE::StrContainIW(it->owner, L"Microsoft"))
+			return true;
+	}
+	return false;
+}
+
+/*++
+Description:
+	get certificate information, if verify ok, return true, vice versa.
+Arguments:
+	file - file path
+	infos - certificate information
+	revoked_check - revocation check
+Return:
+	bool
+--*/
+bool SeGetCertInfoA(__in const std::string &file, __out std::vector<UNONE::CertInfoA> &infos, __in bool revoked_check)
+{
+	bool ret = false;
+	std::vector<UNONE::CertInfoW> w_infos;
+	ret = SeGetCertInfoW(StrToW(file), w_infos, revoked_check);
+	std::for_each(w_infos.begin(), w_infos.end(), [&infos](CertInfoW &ci) {
+		CertInfoA info;
+		info.sn = UNONE::StrToA(ci.sn);
+		info.owner = UNONE::StrToA(ci.owner);
+		infos.push_back(info);
+	});
+	return ret;
+}
+
+/*++
+Description:
+	get certificate information, if verify ok, return true, vice versa.
+Arguments:
+	file - file path
+	infos - certificate information
+	revoked_check - revocation check
+Return:
+	bool
+--*/
+bool SeGetCertInfoW(__in const std::wstring &file, __out std::vector<UNONE::CertInfoW> &infos, __in bool revoked_check)
+{
+	auto ret = OpSignatureInfoW(file, infos, revoked_check, false);
+	return ret;
+}
+
 
 }
