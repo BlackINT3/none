@@ -26,6 +26,7 @@
 #include <os/unone-os.h>
 #include <file/unone-fs.h>
 #include <object/unone-ob.h>
+#include "wow64/wow64ext.h"
 #include "unone-ps.h"
 
 namespace {
@@ -443,6 +444,69 @@ DWORD PsGetParentPid(__in DWORD pid)
 	CloseHandle(process);
 	return ppid;
 }
+
+/*++
+Description:
+	get process id by thread id
+Arguments:
+	tid - thread id
+Return:
+	process pid
+--*/
+DWORD PsGetPidByThread(__in DWORD tid)
+{
+	DWORD retlen = 0;
+	DWORD pid = 0;
+	NTSTATUS status = STATUS_UNSUCCESSFUL;
+	HANDLE thd = OpenThread(THREAD_QUERY_INFORMATION, FALSE, tid);
+	if (!thd) {
+		UNONE_ERROR("OpenThread tid:%d err:%d", tid, GetLastError());
+		return INVALID_TID;
+	}
+#ifdef _M_IX86
+	if (PsIsWow64()) {
+		THREAD_BASIC_INFORMATION64 tbi64;
+		auto pNtQueryInformationThread64 = GetProcAddress64(GetModuleHandle64(L"ntdll.dll"), "NtQueryInformationThread");
+		if (!pNtQueryInformationThread64)
+			return 0;
+		status = (NTSTATUS)X64Call((DWORD64)pNtQueryInformationThread64, 5,
+			(DWORD64)thd,
+			(DWORD64)ThreadBasicInformation,
+			(DWORD64)&tbi64,
+			(DWORD64)sizeof(tbi64),
+			(DWORD64)&retlen);
+		if (!NT_SUCCESS(status)) {
+			UNONE_ERROR("NtQueryInformationThread tid:%d err:%x", tid, status);
+		} else {
+			pid = (DWORD)tbi64.ClientId.UniqueProcess;
+		}
+		CloseHandle(thd);
+		return pid;
+	}
+#endif
+
+#ifdef _M_IX86
+	THREAD_BASIC_INFORMATION32 tbi;
+#else
+	THREAD_BASIC_INFORMATION64 tbi;
+#endif
+	auto pNtQueryInformationThread = (__NtQueryInformationThread)GetProcAddress(GetModuleHandleW(L"ntdll.dll"), "NtQueryInformationThread");
+	if (!pNtQueryInformationThread) return INVALID_TID;
+	status = pNtQueryInformationThread(
+		thd,
+		ThreadBasicInformation,
+		&tbi,
+		sizeof(tbi),
+		&retlen);
+	if (!NT_SUCCESS(status)) {
+		UNONE_ERROR("NtQueryInformationThread tid:%d err:%x", tid, status);
+	} else {
+		pid = (DWORD)tbi.ClientId.UniqueProcess;
+	}
+	CloseHandle(thd);
+	return pid;
+}
+
 
 /*++
 Description:
@@ -1437,6 +1501,9 @@ bool PsEnumMemory(__in DWORD pid, __in MemoryCallback memory_cb)
 	GetSystemInfo(&sysinfo);
 	char *start = (char*)sysinfo.lpMinimumApplicationAddress;
 	char *end = (char*)sysinfo.lpMaximumApplicationAddress;
+	if (PsIsWow64(phd)) {
+		end = (char*)0x7FFE0000;
+	}
 	DWORD pagesize = sysinfo.dwPageSize;
 	do {
 		MEMORY_BASIC_INFORMATION mbi;

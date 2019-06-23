@@ -267,7 +267,6 @@ bool FsReadFileBlockW(__in const std::wstring &fpath, __in int blk_size, __in Re
 	}
 	auto fsize = li.QuadPart;
 	if (fsize == 0) {
-		UNONE_WARN(L"%s is empty file", fpath.c_str());
 		CloseHandle(fd);
 		return true;
 	}

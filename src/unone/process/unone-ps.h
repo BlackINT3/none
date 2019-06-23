@@ -23,6 +23,7 @@
 namespace UNONE {
 	
 #define INVALID_PID -1
+#define INVALID_TID -1
 
 #ifdef _UNICODE
 #define PsGetProcessInfo32 PsGetProcessInfo32W
@@ -139,6 +140,7 @@ UNONE_API bool PsGetPbi64(__in HANDLE phd, __out PROCESS_BASIC_INFORMATION64 &pb
 UNONE_API PVOID PsGetPebAddress32(__in HANDLE phd);
 UNONE_API PVOID64 PsGetPebAddress64(__in HANDLE phd);
 UNONE_API DWORD PsGetParentPid(__in DWORD pid);
+UNONE_API DWORD PsGetPidByThread(__in DWORD tid);
 UNONE_API std::vector<DWORD> PsGetChildPids(__in DWORD pid);
 UNONE_API std::vector<DWORD> PsGetDescendantPids(__in DWORD pid);
 UNONE_API bool PsGetProcessInfo32A(__in DWORD pid, __out PROCESS_BASE_INFOA &info);

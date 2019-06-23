@@ -167,6 +167,7 @@ bool OpSignatureInfoW(const std::wstring &file, std::vector<UNONE::CertInfoW> &i
 	}
 
 	HRESULT hr;
+	DWORD err = ERROR_SUCCESS;
 	WINTRUST_DATA wd = { 0 };
 	HCATINFO catalog = NULL;
 	GUID action = WINTRUST_ACTION_GENERIC_VERIFY_V2;
@@ -223,7 +224,7 @@ bool OpSignatureInfoW(const std::wstring &file, std::vector<UNONE::CertInfoW> &i
 
 		hr = pWinVerifyTrust(NULL, &action, &wd);
 		ret = SUCCEEDED(hr);
-		if (!ret) SetLastError(hr);
+		if (!ret) err = hr;
 		if (only_verify) break;
 
 		HMODULE crypt32 = GetModuleHandleW(L"crypt32.dll");
@@ -258,7 +259,6 @@ bool OpSignatureInfoW(const std::wstring &file, std::vector<UNONE::CertInfoW> &i
 			infos.push_back(info);
 			break;
 		}
-		ret = true;
 	} while (0);
 
 	//Free wd.hWVTStateData
@@ -267,6 +267,7 @@ bool OpSignatureInfoW(const std::wstring &file, std::vector<UNONE::CertInfoW> &i
 	if (catalog != NULL) pCryptCATAdminReleaseCatalogContext(catadmin, catalog, 0);
 	pCryptCATAdminReleaseContext(catadmin, 0);
 
+	if (!ret) SetLastError(err);
 	return ret;
 }
 

@@ -782,15 +782,87 @@ typedef VOID (NTAPI* __RtlInitUnicodeString)(
 }
 #endif
 
+//
+// Object Attributes structure
+//
+typedef enum _OBJECT_INFORMATION_CLASS {
+	ObjectBasicInformation,
+	ObjectNameInformation,
+	ObjectTypeInformation,
+	ObjectTypesInformation,
+	ObjectHandleFlagInformation,
+	ObjectSessionInformation,
+	MaxObjectInfoClass  // MaxObjectInfoClass should always be the last enum
+} OBJECT_INFORMATION_CLASS;
+
+typedef struct _OBJECT_BASIC_INFORMATION {
+	ULONG Attributes;
+	ACCESS_MASK GrantedAccess;
+	ULONG HandleCount;
+	ULONG PointerCount;
+	ULONG PagedPoolCharge;
+	ULONG NonPagedPoolCharge;
+	ULONG Reserved[3];
+	ULONG NameInfoSize;
+	ULONG TypeInfoSize;
+	ULONG SecurityDescriptorSize;
+	LARGE_INTEGER CreationTime;
+} OBJECT_BASIC_INFORMATION, *POBJECT_BASIC_INFORMATION;
+
+typedef struct _OBJECT_NAME_INFORMATION {               // ntddk wdm nthal
+	UNICODE_STRING Name;                                // ntddk wdm nthal
+} OBJECT_NAME_INFORMATION, *POBJECT_NAME_INFORMATION;   // ntddk wdm nthal
+
+typedef struct _OBJECT_TYPE_INFORMATION {
+	UNICODE_STRING TypeName;
+	ULONG TotalNumberOfObjects;
+	ULONG TotalNumberOfHandles;
+	ULONG TotalPagedPoolUsage;
+	ULONG TotalNonPagedPoolUsage;
+	ULONG TotalNamePoolUsage;
+	ULONG TotalHandleTableUsage;
+	ULONG HighWaterNumberOfObjects;
+	ULONG HighWaterNumberOfHandles;
+	ULONG HighWaterPagedPoolUsage;
+	ULONG HighWaterNonPagedPoolUsage;
+	ULONG HighWaterNamePoolUsage;
+	ULONG HighWaterHandleTableUsage;
+	ULONG InvalidAttributes;
+	GENERIC_MAPPING GenericMapping;
+	ULONG ValidAccessMask;
+	BOOLEAN SecurityRequired;
+	BOOLEAN MaintainHandleCount;
+	ULONG PoolType;
+	ULONG DefaultPagedPoolCharge;
+	ULONG DefaultNonPagedPoolCharge;
+} OBJECT_TYPE_INFORMATION, *POBJECT_TYPE_INFORMATION;
+
+typedef struct _OBJECT_TYPES_INFORMATION {
+	ULONG NumberOfTypes;
+	// OBJECT_TYPE_INFORMATION TypeInformation;
+} OBJECT_TYPES_INFORMATION, *POBJECT_TYPES_INFORMATION;
+
+typedef struct _OBJECT_HANDLE_FLAG_INFORMATION {
+	BOOLEAN Inherit;
+	BOOLEAN ProtectFromClose;
+} OBJECT_HANDLE_FLAG_INFORMATION, *POBJECT_HANDLE_FLAG_INFORMATION;
+
 typedef struct _OBJECT_ATTRIBUTES {
 	ULONG Length;
 	HANDLE RootDirectory;
 	PUNICODE_STRING ObjectName;
 	ULONG Attributes;
-	PVOID SecurityDescriptor;
-	PVOID SecurityQualityOfService;
-} OBJECT_ATTRIBUTES;
-typedef OBJECT_ATTRIBUTES *POBJECT_ATTRIBUTES;
+	PVOID SecurityDescriptor;        // Points to type SECURITY_DESCRIPTOR
+	PVOID SecurityQualityOfService;  // Points to type SECURITY_QUALITY_OF_SERVICE
+} OBJECT_ATTRIBUTES, *POBJECT_ATTRIBUTES;
+
+typedef NTSTATUS(NTAPI *__NtQueryObject)(
+	__in_opt HANDLE  Handle,
+	__in OBJECT_INFORMATION_CLASS  ObjectInformationClass,
+	__out_bcount_opt(ObjectInformationLength) PVOID  ObjectInformation,
+	__in ULONG  ObjectInformationLength,
+	__out_opt PULONG  ReturnLength
+	);
 
 typedef NTSTATUS (NTAPI* __NtOpenSymbolicLinkObject) (
 	OUT PHANDLE SymbolicLinkHandle,
