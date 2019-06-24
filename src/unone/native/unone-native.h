@@ -1012,7 +1012,7 @@ typedef DWORD (WINAPI *__Wow64SuspendThread)(
 );
 
 // RtlCreateUserThread
-typedef NTSTATUS(NTAPI *__RtlCreateUserThread)(
+typedef NTSTATUS (NTAPI *__RtlCreateUserThread)(
 	IN HANDLE Process,
 	IN PSECURITY_DESCRIPTOR ThreadSecurityDescriptor OPTIONAL,
 	IN BOOLEAN CreateSuspended,
@@ -1034,6 +1034,16 @@ typedef VOID (NTAPI* __RtlGetNtVersionNumbers)(
 	OUT PULONG MinorVer,
 	OUT PULONG BuildNumber
 );
+
+// Driver
+typedef NTSTATUS (NTAPI *__NtLoadDriver)(
+	IN PUNICODE_STRING  DriverServiceName
+	);
+typedef NTSTATUS (NTAPI *__NtUnloadDriver)(
+	IN PUNICODE_STRING  DriverServiceName
+	);
+
+
 
 #ifdef __cplusplus
 } // extern "C"

@@ -78,6 +78,10 @@ UNONE_API bool FsInsertFileDataW(__in const std::wstring& fpath, __in std::strin
 
 UNONE_API std::string FsPathToNameA(__in const std::string& fpath);
 UNONE_API std::wstring FsPathToNameW(__in const std::wstring& fpath);
+UNONE_API std::string FsPathToPureNameA(__in const std::string& fpath);
+UNONE_API std::wstring FsPathToPureNameW(__in const std::wstring& fpath);
+UNONE_API std::string FsPathToExtensionA(__in const std::string& fpath);
+UNONE_API std::wstring FsPathToExtensionW(__in const std::wstring& fpath);
 UNONE_API std::string FsPathToDirA(__in const std::string& fpath, __in int up_level = 1);
 UNONE_API std::wstring FsPathToDirW(__in const std::wstring& fpath, __in int up_level = 1);
 UNONE_API std::string FsPathComposeA(__in const std::string& fpath, __in const std::string& subpath);

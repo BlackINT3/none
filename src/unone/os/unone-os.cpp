@@ -263,6 +263,34 @@ std::wstring OsSessionUserNameW(__in DWORD id)
 
 /*++
 Description:
+	get windows directory (WinDir/SystemRoot)
+Arguments:
+	void
+Return:
+	directory
+--*/
+std::string OsWinDirA()
+{
+	return StrToA(OsWinDirW());
+}
+
+/*++
+Description:
+	get windows directory (WinDir/SystemRoot)
+Arguments:
+	void
+Return:
+	directory
+--*/
+std::wstring OsWinDirW()
+{
+	wchar_t windir[MAX_PATH] = { 0 };
+	GetWindowsDirectoryW(windir, MAX_PATH);
+	return windir;
+}
+
+/*++
+Description:
 	get system 32bit directory
 Arguments:
 	void

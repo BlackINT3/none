@@ -35,5 +35,14 @@ UNONE_API bool ObParseToDosPathA(__in std::string ori_path, __out std::string& d
 UNONE_API bool ObParseToDosPathW(__in std::wstring ori_path, __out std::wstring& dos_path);
 UNONE_API bool ObParseToNtPathA(__in std::string ori_path, __out std::string& nt_path);
 UNONE_API bool ObParseToNtPathW(__in std::wstring ori_path, __out std::wstring& nt_path);
+UNONE_API bool ObLoadDriverA(__in const std::string &file_path, __in std::string srv_name = "");
+UNONE_API bool ObLoadDriverW(__in const std::wstring &file_path, __in std::wstring srv_name = L"");
+UNONE_API bool ObUnloadDriverA(__in const std::string &srv_name);
+UNONE_API bool ObUnloadDriverW(__in const std::wstring &srv_name);
+UNONE_API bool ObGetDriverList(__out std::vector<LPVOID> &drivers);
+UNONE_API std::string ObGetDriverNameA(__in LPVOID driver);
+UNONE_API std::wstring ObGetDriverNameW(__in LPVOID driver);
+UNONE_API std::string ObGetDriverPathA(__in LPVOID driver);
+UNONE_API std::wstring ObGetDriverPathW(__in LPVOID driver);
 
 } // namespace UNONE

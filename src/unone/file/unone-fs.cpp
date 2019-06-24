@@ -428,6 +428,70 @@ std::wstring FsPathToNameW(__in const std::wstring& fpath)
 
 /*++
 Description:
+	file path to pure name (no extension)
+Arguments:
+	fpath - file path
+Return:
+	file pure name (no extension)
+--*/
+std::string FsPathToPureNameA(__in const std::string& fpath)
+{
+	auto &&str = FsPathToNameA(fpath);
+	int pos = str.find_last_of(".");
+	if (pos == std::string::npos) return str;
+	return str.substr(0, pos);
+}
+
+/*++
+Description:
+	file path to pure name (no extension)
+Arguments:
+	fpath - file path
+Return:
+	file pure name (no extension)
+--*/
+std::wstring FsPathToPureNameW(__in const std::wstring& fpath)
+{
+	auto &&str = FsPathToNameW(fpath);
+	int pos = str.find_last_of(L".");
+	if (pos == std::wstring::npos) return str;
+	return str.substr(0, pos);
+}
+
+/*++
+Description:
+	file path to extension
+Arguments:
+	fpath - file path
+Return:
+	file extension
+--*/
+std::string FsPathToExtensionA(__in const std::string& fpath)
+{
+	auto &&str = FsPathToNameA(fpath);
+	int pos = str.find_last_of(".");
+	if (pos == std::wstring::npos) return "";
+	return str.substr(pos);
+}
+
+/*++
+Description:
+	file path to extension
+Arguments:
+	fpath - file path
+Return:
+	file extension
+--*/
+std::wstring FsPathToExtensionW(__in const std::wstring& fpath)
+{
+	auto &&str = FsPathToNameW(fpath);
+	int pos = str.find_last_of(L".");
+	if (pos == std::wstring::npos) return L"";
+	return str.substr(pos);
+}
+
+/*++
+Description:
 	file path to dir
 Arguments:
 	fpath - file path

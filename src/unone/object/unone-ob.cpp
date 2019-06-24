@@ -14,10 +14,16 @@
 **
 ****************************************************************************/
 #include <Windows.h>
-#include <tchar.h>
+#include <Psapi.h>
+#include <shlwapi.h>
+#pragma comment(lib, "Psapi.lib")
+#pragma comment(lib, "shlwapi.lib")
 #include <common/unone-common.h>
 #include <native/unone-native.h>
 #include <internal/unone-internal.h>
+#include <file/unone-fs.h>
+#include <os/unone-os.h>
+#include <security/unone-se.h>
 #include <string/unone-str.h>
 #include "unone-ob.h"
 
@@ -256,5 +262,176 @@ bool ObParseToNtPathW(__in std::wstring ori_path, __out std::wstring& nt_path)
 	nt_path = target + rel;
 	return true;
 }
+/*++
+Description:
+	load driver
+Arguments:
+	file_path - driver file path
+	srv_name - driver service name
+Return:
+	bool
+--*/
+bool ObLoadDriverA(__in const std::string &file_path, __in std::string srv_name)
+{
+	return ObLoadDriverW(UNONE::StrToW(file_path), UNONE::StrToW(srv_name));
+}
+
+/*++
+Description:
+	load driver
+Arguments:
+	file_path - driver file path
+	srv_name - driver service name
+Return:
+	bool
+--*/
+bool ObLoadDriverW(__in const std::wstring &file_path, __in std::wstring srv_name)
+{
+	if (srv_name.empty()) srv_name = FsPathToPureNameW(file_path);
+	if (!SeEnablePrivilegeW(NULL, SE_LOAD_DRIVER_PRIVILEGE)) {
+		UNONE_ERROR("enable SE_LOAD_DRIVER_PRIVILEGE err");
+		return false;
+	}
+	HMODULE ntdll = GetModuleHandleW(L"ntdll.dll");
+	auto pRtlInitUnicodeString = (__RtlInitUnicodeString)GetProcAddress(ntdll, "RtlInitUnicodeString");
+	if (!pRtlInitUnicodeString) return false;
+	auto pNtLoadDriver = (__NtLoadDriver)GetProcAddress(ntdll, "NtLoadDriver");
+	if (!pNtLoadDriver) return false;
+
+	std::wstring driver_path = UNONE::FsPathStandardW(L"\\??\\" + file_path);
+	HKEY subkey;
+	DWORD dispos;
+	std::wstring key_name = L"SYSTEM\\CurrentControlSet\\services\\" + srv_name;
+	LONG result = RegCreateKeyExW(HKEY_LOCAL_MACHINE, key_name.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &subkey, &dispos);
+	if (result != ERROR_SUCCESS) {
+		UNONE_ERROR(L"RegCreateKeyExW %s err:%d", key_name.c_str(), result);
+		return false;
+	}
+	DWORD start = SERVICE_DEMAND_START;
+	result = RegSetValueExW(subkey, L"Start", 0, REG_DWORD, (BYTE*)&start, sizeof(start));
+	if (result != ERROR_SUCCESS) {
+		UNONE_ERROR(L"RegSetValueW err:%d", result);
+	}
+
+	DWORD type = SERVICE_KERNEL_DRIVER;
+	result = RegSetValueExW(subkey, L"Type", 0, REG_DWORD, (BYTE*)&type, sizeof(type));
+	if (result != ERROR_SUCCESS) {
+		UNONE_ERROR(L"RegSetValueW err:%d", result);
+	}
+
+	DWORD errctl = SERVICE_ERROR_NORMAL;
+	result = RegSetValueExW(subkey, L"ErrorControl", 0, REG_DWORD, (BYTE*)&errctl, sizeof(errctl));
+	if (result != ERROR_SUCCESS) {
+		UNONE_ERROR(L"RegSetValueW err:%d", result);
+	}
+
+	result = RegSetValueExW(subkey, L"ImagePath", 0, REG_EXPAND_SZ, (BYTE*)driver_path.c_str(), (DWORD)driver_path.size()*2);
+	if (result != ERROR_SUCCESS) {
+		UNONE_ERROR(L"RegSetValueW err:%d", result);
+	}
+
+	RegCloseKey(subkey);
+
+	bool ret = true;
+	NTSTATUS status;
+	UNICODE_STRING ustr;
+	std::wstring wstr = L"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\" + srv_name;
+	pRtlInitUnicodeString(&ustr, wstr.c_str());
+	status = pNtLoadDriver(&ustr);
+	if (!NT_SUCCESS(status)) {
+		UNONE_ERROR(L"NtLoadDriver service:%s err:%x", wstr.c_str(), status);
+		SHDeleteKeyW(HKEY_LOCAL_MACHINE, key_name.c_str());
+		ret = false;
+	}
+	return ret;
+}
+
+/*++
+Description:
+	get driver list
+Arguments:
+	drivers - driver list
+Return:
+	bool
+--*/
+bool ObGetDriverList(__out std::vector<LPVOID> &drivers)
+{
+	DWORD needed = 0;
+	if (EnumDeviceDrivers(NULL, 0, &needed)) {
+		int count = needed / sizeof(LPVOID);
+		drivers.resize(count);
+		if (EnumDeviceDrivers(&drivers[0], needed, &needed)) {
+			return true;
+		}
+		drivers.clear();
+	}
+	return false;
+}
+
+/*++
+Description:
+	get driver name
+Arguments:
+	driver - driver image base
+Return:
+	bool
+--*/
+std::string ObGetDriverNameA(__in LPVOID driver)
+{
+	return StrToA(ObGetDriverNameW(driver));
+}
+
+/*++
+Description:
+	get driver name
+Arguments:
+	driver - driver image base
+Return:
+	bool
+--*/
+std::wstring ObGetDriverNameW(__in LPVOID driver)
+{
+	WCHAR data[MAX_PATH] = { 0 };
+	if (GetDeviceDriverBaseNameW(driver, data, MAX_PATH - 1)) {
+		return data;
+	}
+	return L"";
+}
+
+/*++
+Description:
+	get driver path
+Arguments:
+	driver - driver image base
+Return:
+	bool
+--*/
+std::string ObGetDriverPathA(__in LPVOID driver)
+{
+	return StrToA(ObGetDriverPathW(driver));
+}
+
+/*++
+Description:
+	get driver path
+Arguments:
+	driver - driver image base
+Return:
+	bool
+--*/
+std::wstring ObGetDriverPathW(__in LPVOID driver)
+{
+	WCHAR data[MAX_PATH] = { 0 };
+	if (GetDeviceDriverFileNameW(driver, data, MAX_PATH - 1)) {
+		std::wstring path = data;
+		std::wstring sysroot = L"\\SystemRoot";
+		auto pos = path.find(sysroot);
+		if (pos == 0) path.replace(0, sysroot.size(), OsWinDirW());
+		StrReplaceW(path, L"\\??\\");
+		return path;
+	}
+	return L"";
+}
+
 
 }

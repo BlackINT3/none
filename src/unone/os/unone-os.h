@@ -48,6 +48,8 @@ UNONE_API std::string OsUserNameA();
 UNONE_API std::wstring OsUserNameW();
 UNONE_API std::string OsSessionUserNameA(__in DWORD id);
 UNONE_API std::wstring OsSessionUserNameW(__in DWORD id);
+UNONE_API std::string OsWinDirA();
+UNONE_API std::wstring OsWinDirW();
 UNONE_API std::string OsSysDir32A();
 UNONE_API std::wstring OsSysDir32W();
 UNONE_API std::string OsSystem32DirA();
