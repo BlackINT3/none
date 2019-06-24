@@ -15,7 +15,8 @@
 ****************************************************************************/
 #pragma once
 
-#define UNONE_VERSION	"1.0.0"
+#define UNONE_VERSION	"1.0.2"
+
 #include "internal/unone-internal.h"
 
 #include "native/unone-native.h"
