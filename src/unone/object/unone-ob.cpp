@@ -359,8 +359,16 @@ bool ObGetDriverList(__out std::vector<LPVOID> &drivers)
 	DWORD needed = 0;
 	if (EnumDeviceDrivers(NULL, 0, &needed)) {
 		int count = needed / sizeof(LPVOID);
-		drivers.resize(count);
-		if (EnumDeviceDrivers(&drivers[0], needed, &needed)) {
+		std::vector<LPVOID> images;
+		images.resize(count);
+		if (EnumDeviceDrivers(&images[0], needed, &needed)) {
+			SYSTEM_INFO sysinfo;
+			GetSystemInfo(&sysinfo);
+			for (size_t i = 0; i < images.size(); i++) {
+				auto addr = images[i];
+				if (addr > sysinfo.lpMaximumApplicationAddress)
+					drivers.push_back(addr);
+			}
 			return true;
 		}
 		drivers.clear();
