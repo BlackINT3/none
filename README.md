@@ -2,7 +2,9 @@
 
 ### Introduction
 
-UNONE and KNONE is a couple of open source base library that makes it easy to develop software on Windows. It aimmed at programming, reversing, diving into Windows internal, and evolving into reliable and maintainable project.
+* [中文说明](https://github.com/BlackINT3/none/blob/master/doc/README-zh.md)
+
+UNONE and KNONE is a couple of open source c++ base library that makes it easy to develop software on Windows. It aimmed at programming, reversing, diving into Windows internal, and evolving into reliable and maintainable project.
 
 ### Architecture
 
@@ -25,9 +27,9 @@ UNONE and KNONE is a couple of open source base library that makes it easy to de
 
 ### How to use ?
 Use nuget package
-* Install by disk: Open console (eg: View - Other Windows - Package Manager Conosle), Install-Package C:\vs2015-unone.1.0.0.nupkg
-* Install by server: Set Nuget sources url (Tools - Options - Nuget Package Manager - Package Sources)
-* Uninstall: eg: Uninstall-Package vs2015-unone
+* Install by disk: Open Visual Studio console (eg: View - Other Windows - Package Manager Conosle, type in Install-Package C:\vs2015-unone.1.0.0.nupkg)
+* Install by server: Set Nuget sources url (Tools - Options - Nuget Package Manager - Package Sources), and right click on project - Manage Nuget Packages - Browse package, just install it.
+* Uninstall: use command Uninstall-Package, eg: Uninstall-Package vs2015-unone, also be opposite to upon.
 * BTW: Nuget addons must be installed manualy in Visual Studio 2010.
 
 Use libs or dlls
@@ -35,17 +37,18 @@ Use libs or dlls
  
 ### Who used ?
   * [OpenArk](https://github.com/BlackINT3/OpenArk)
+  * more in future...
 
 ### Distributions
 * Binaray (lib/dll/package)
   * static lib 32/64 bit (UNONE)
   * dynamic lib 32/64 bit (UNONE/KNONE)
-  * dynamic dll 32/64 bit ((UNONE))
-  * .nupkg (UNONE/KNONE)
+  * dynamic dll 32/64 bit (UNONE)
+  * .nupkg Nuget Package (UNONE/KNONE)
 * Package Manager
-  * [Nuget](https://docs.microsoft.com/en-us/nuget/)
-  * [CoApp](http://coapp.org/)
-  * [Klondike](https://github.com/chriseldredge/Klondike)
+  * [Nuget](https://docs.microsoft.com/en-us/nuget/) - Nuget Core
+  * [CoApp](http://coapp.org/)  - Nuget package build toolkit
+  * [Klondike](https://github.com/chriseldredge/Klondike) - Nuget package web server
 * Supported Compiler
   * Visual Studio 2010 (vc100)
   * Visual Studio 2012 (vc110)
