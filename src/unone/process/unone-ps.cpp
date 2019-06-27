@@ -1676,6 +1676,11 @@ Return:
 --*/
 bool PsRestartProcess(__in DWORD pid)
 {
+	if (pid == GetCurrentProcessId()) {
+		UNONE::PsCreateProcessW(UNONE::PsGetProcessPathW());
+		ExitProcess(0);
+		return true;
+	}
 	PROCESS_BASE_INFOW info;
 	bool ret = UNONE::PsGetProcessInfoW(pid, info);
 	if (!ret) return false;

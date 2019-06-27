@@ -348,6 +348,53 @@ bool ObLoadDriverW(__in const std::wstring &file_path, __in std::wstring srv_nam
 
 /*++
 Description:
+	unload driver
+Arguments:
+	srv_name - driver service name
+Return:
+	bool
+--*/
+bool ObUnloadDriverA(__in const std::string &srv_name)
+{
+	return ObUnloadDriverW(UNONE::StrToW(srv_name));
+}
+
+/*++
+Description:
+	unload driver
+Arguments:
+	srv_name - driver service name
+Return:
+	bool
+--*/
+bool ObUnloadDriverW(__in const std::wstring &srv_name)
+{
+	if (!SeEnablePrivilegeW(NULL, SE_LOAD_DRIVER_PRIVILEGE)) {
+		UNONE_ERROR("enable SE_LOAD_DRIVER_PRIVILEGE err");
+		return false;
+	}
+	HMODULE ntdll = GetModuleHandleW(L"ntdll.dll");
+	auto pRtlInitUnicodeString = (__RtlInitUnicodeString)GetProcAddress(ntdll, "RtlInitUnicodeString");
+	if (!pRtlInitUnicodeString) return false;
+	auto pNtUnloadDriver = (__NtUnloadDriver)GetProcAddress(ntdll, "NtUnloadDriver");
+	if (!pNtUnloadDriver) return false;
+
+	NTSTATUS status;
+	UNICODE_STRING ustr;
+	std::wstring wstr = L"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\" + srv_name;
+	std::wstring key_name = L"SYSTEM\\CurrentControlSet\\services\\" + srv_name;
+	pRtlInitUnicodeString(&ustr, wstr.c_str());
+	status = pNtUnloadDriver(&ustr);
+	if (!NT_SUCCESS(status)) {
+		UNONE_ERROR(L"NtUnloadDriver service:%s err:%x", wstr.c_str(), status);
+		return false;
+	}
+	SHDeleteKeyW(HKEY_LOCAL_MACHINE, key_name.c_str());
+	return true;
+}
+
+/*++
+Description:
 	get driver list
 Arguments:
 	drivers - driver list
