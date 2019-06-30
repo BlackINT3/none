@@ -77,6 +77,7 @@
     <IncludePath>$(WDKPATH)\INC\api;$(WDKPATH)\INC\crt;$(WDKPATH)\INC\ddk;$(IncludePath)</IncludePath>
     <LibraryPath>$(WDKPATH)\lib\wxp\i386;$(WDKPATH)\lib\crt\i386;$(LibraryPath)</LibraryPath>
     <GenerateManifest>false</GenerateManifest>
+    <IntDir>intermediate-files\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -96,6 +97,7 @@
     <IncludePath>$(WDKPATH)\INC\api;$(WDKPATH)\INC\crt;$(WDKPATH)\INC\ddk;$(IncludePath)</IncludePath>
     <LibraryPath>$(WDKPATH)\lib\wxp\i386;$(WDKPATH)\lib\crt\i386;$(LibraryPath)</LibraryPath>
     <GenerateManifest>false</GenerateManifest>
+    <IntDir>intermediate-files\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -113,10 +115,11 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_X86_;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DBG;_ARKDRV_;_X86_;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <BufferSecurityCheck>
+      </BufferSecurityCheck>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CallingConvention>StdCall</CallingConvention>
     </ClCompile>
@@ -124,12 +127,13 @@
       <SubSystem>Native</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EntryPointSymbol>DriverEntry</EntryPointSymbol>
-      <AdditionalDependencies>ntoskrnl.lib;hal.lib;ntstrsafe.lib;tdi.lib;knone-$(Configuration)$(PlatformArchitecture).lib</AdditionalDependencies>
+      <AdditionalDependencies>ntoskrnl.lib;hal.lib;ntstrsafe.lib;tdi.lib;bufferoverflowK.lib;knone-$(Configuration)$(PlatformArchitecture).lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
       <Driver>Driver</Driver>
       <RandomizedBaseAddress>
       </RandomizedBaseAddress>
       <DataExecutionPrevention />
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -138,10 +142,11 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_AMD64_;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DBG;_ARKDRV_;_AMD64_;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <BufferSecurityCheck>
+      </BufferSecurityCheck>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CallingConvention>StdCall</CallingConvention>
     </ClCompile>
@@ -149,12 +154,13 @@
       <SubSystem>Native</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EntryPointSymbol>DriverEntry</EntryPointSymbol>
-      <AdditionalDependencies>ntoskrnl.lib;hal.lib;ntstrsafe.lib;tdi.lib;knone-$(Configuration)$(PlatformArchitecture).lib</AdditionalDependencies>
+      <AdditionalDependencies>ntoskrnl.lib;hal.lib;ntstrsafe.lib;tdi.lib;bufferoverflowK.lib;knone-$(Configuration)$(PlatformArchitecture).lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
       <Driver>Driver</Driver>
       <RandomizedBaseAddress>
       </RandomizedBaseAddress>
       <DataExecutionPrevention />
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -165,9 +171,11 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>_X86_;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_ARKDRV_;_X86_;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <CallingConvention>StdCall</CallingConvention>
+      <BufferSecurityCheck>
+      </BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Native</SubSystem>
@@ -175,12 +183,13 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EntryPointSymbol>DriverEntry</EntryPointSymbol>
-      <AdditionalDependencies>ntoskrnl.lib;hal.lib;ntstrsafe.lib;tdi.lib;knone-$(Configuration)$(PlatformArchitecture).lib</AdditionalDependencies>
+      <AdditionalDependencies>ntoskrnl.lib;hal.lib;ntstrsafe.lib;tdi.lib;bufferoverflowK.lib;knone-$(Configuration)$(PlatformArchitecture).lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
       <Driver>Driver</Driver>
       <RandomizedBaseAddress>
       </RandomizedBaseAddress>
       <DataExecutionPrevention />
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -191,9 +200,11 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>_AMD64_;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_ARKDRV_;_AMD64_;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <CallingConvention>StdCall</CallingConvention>
+      <BufferSecurityCheck>
+      </BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Native</SubSystem>
@@ -201,12 +212,13 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EntryPointSymbol>DriverEntry</EntryPointSymbol>
-      <AdditionalDependencies>ntoskrnl.lib;hal.lib;ntstrsafe.lib;tdi.lib;knone-$(Configuration)$(PlatformArchitecture).lib</AdditionalDependencies>
+      <AdditionalDependencies>ntoskrnl.lib;hal.lib;ntstrsafe.lib;tdi.lib;bufferoverflowK.lib;knone-$(Configuration)$(PlatformArchitecture).lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
       <Driver>Driver</Driver>
       <RandomizedBaseAddress>
       </RandomizedBaseAddress>
       <DataExecutionPrevention />
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
