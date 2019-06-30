@@ -14,3 +14,48 @@
 **
 ****************************************************************************/
 #pragma once
+#include <ntifs.h>
+#include <ntdef.h>
+#include <WinDef.h>
+#include <ntstrsafe.h>
+
+#define INVALID_VERSION -1
+
+typedef enum _NTOS_VERSION {
+	NTOS_UNKNOWN,
+	NTOS_WINXP,
+	NTOS_WINXPSP1,
+	NTOS_WINXPSP2,
+	NTOS_WINXPSP3,
+	NTOS_WIN2003,
+	NTOS_WIN2003SP1,
+	NTOS_WIN2003SP2,
+	NTOS_WINVISTA,
+	NTOS_WINVISTASP1,
+	NTOS_WINVISTASP2,
+	NTOS_WIN7,
+	NTOS_WIN7SP1,
+	NTOS_WIN8,
+	NTOS_WIN81,
+	NTOS_WIN10_1507, //10240
+	NTOS_WIN10_1511, //10586
+	NTOS_WIN10_1607, //14393
+	NTOS_WIN10_1703, //15063
+	NTOS_WIN10_1709, //16299
+	NTOS_WIN10_1803, //17134
+	NTOS_WIN10_1809, //17763
+	NTOS_WIN10_1903  //18362
+} NTOS_VERSION, *PNTOS_VERSION;
+
+namespace KNONE {
+
+KNONE_API NTOS_VERSION OsNtVersion();
+KNONE_API ULONG OsMajorVersion();
+KNONE_API ULONG OsMinorVersion();
+KNONE_API ULONG OsBuildNumber();
+KNONE_API BOOLEAN OsGetVersionInfo(IN OUT RTL_OSVERSIONINFOEXW &info);
+
+
+} // namespace KNONE
+
+

@@ -110,7 +110,8 @@
       <PreprocessorDefinitions>_X86_;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <BufferSecurityCheck>
+      </BufferSecurityCheck>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CallingConvention>StdCall</CallingConvention>
     </ClCompile>
@@ -128,7 +129,8 @@
       <PreprocessorDefinitions>_AMD64_;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <BufferSecurityCheck>
+      </BufferSecurityCheck>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CallingConvention>StdCall</CallingConvention>
     </ClCompile>
@@ -147,7 +149,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_X86_;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <BufferSecurityCheck>
+      </BufferSecurityCheck>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CallingConvention>StdCall</CallingConvention>
     </ClCompile>
@@ -168,7 +171,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_AMD64_;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <BufferSecurityCheck>
+      </BufferSecurityCheck>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CallingConvention>StdCall</CallingConvention>
     </ClCompile>
