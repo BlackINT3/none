@@ -1,6 +1,6 @@
 nuget {    
     nuspec {
-        id = knone;
+        id = wdk71-knone;
         version : 1.0.0;
         title: KNONE;
         authors: BlackINT3;
