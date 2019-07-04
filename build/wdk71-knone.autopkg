@@ -26,22 +26,22 @@ nuget {
             ${root}\**\*.h;
         };
         
-        [Desktop,Win32,Debug,dynamic] {
+        [Win32,Debug,dynamic] {
             lib: {
                 ${root}\knone-Debug32.lib
             };
         }
-        [Desktop,Win32,Release,dynamic] {
+        [Win32,Release,dynamic] {
             lib: {
                 ${root}\knone-Release32.lib
             };
         }
-        [Desktop,x64,Debug,dynamic] {
+        [x64,Debug,dynamic] {
             lib: {
                 ${root}\knone-Debug64.lib
             };
         }
-        [Desktop,x64,Release,dynamic] {
+        [x64,Release,dynamic] {
             lib: {
                 ${root}\knone-Release64.lib
             };
