@@ -437,7 +437,7 @@ Return:
 std::string FsPathToPureNameA(__in const std::string& fpath)
 {
 	auto &&str = FsPathToNameA(fpath);
-	int pos = str.find_last_of(".");
+	int pos = (int)str.find_last_of(".");
 	if (pos == std::string::npos) return str;
 	return str.substr(0, pos);
 }
@@ -453,7 +453,7 @@ Return:
 std::wstring FsPathToPureNameW(__in const std::wstring& fpath)
 {
 	auto &&str = FsPathToNameW(fpath);
-	int pos = str.find_last_of(L".");
+	int pos = (int)str.find_last_of(L".");
 	if (pos == std::wstring::npos) return str;
 	return str.substr(0, pos);
 }
@@ -469,7 +469,7 @@ Return:
 std::string FsPathToExtensionA(__in const std::string& fpath)
 {
 	auto &&str = FsPathToNameA(fpath);
-	int pos = str.find_last_of(".");
+	int pos = (int)str.find_last_of(".");
 	if (pos == std::wstring::npos) return "";
 	return str.substr(pos);
 }
@@ -485,7 +485,7 @@ Return:
 std::wstring FsPathToExtensionW(__in const std::wstring& fpath)
 {
 	auto &&str = FsPathToNameW(fpath);
-	int pos = str.find_last_of(L".");
+	int pos = (int)str.find_last_of(L".");
 	if (pos == std::wstring::npos) return L"";
 	return str.substr(pos);
 }

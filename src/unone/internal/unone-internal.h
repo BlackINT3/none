@@ -42,7 +42,7 @@
 #endif
 //'1' => 1 / 'A' => A
 #ifndef CHAR_TO_HEX
-#define CHAR_TO_HEX(x)	(isdigit((unsigned char)(x)) ? (unsigned char)(x)-'0' : (unsigned char)(toupper(x))-'a'+10)
+#define CHAR_TO_HEX(x)	(isdigit((unsigned char)(x)) ? (unsigned char)(x)-'0' : (unsigned char)(tolower(x))-'a'+10)
 #endif
 
 #ifndef IN_RANGE
