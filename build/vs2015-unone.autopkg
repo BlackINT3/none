@@ -1,8 +1,8 @@
 nuget {    
     nuspec {
-        id = vs2015-unone;
+        id = unone-vs2015;
         version : 1.0.2;
-        title: UNONE;
+        title: unone-vs2015;
         authors: BlackINT3;
         owners: BlackINT3;
         licenseUrl: "https://github.com/BlackINT3/none";

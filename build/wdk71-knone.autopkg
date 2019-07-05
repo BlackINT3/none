@@ -1,8 +1,8 @@
 nuget {    
     nuspec {
-        id = wdk71-knone;
+        id = knone-wdk71;
         version : 1.0.0;
-        title: KNONE;
+        title: knone-wdk71;
         authors: BlackINT3;
         owners: BlackINT3;
         licenseUrl: "https://github.com/BlackINT3/none";
