@@ -16,6 +16,7 @@
 #include <Windows.h>
 #include <tchar.h>
 #include <memory>
+#include <map>
 #include <WtsApi32.h>
 #pragma comment(lib, "WtsApi32.lib")
 #include <common/unone-common.h>
@@ -121,6 +122,44 @@ DWORD OsBuildNumber()
 		pRtlGetNtVersionNumbers(NULL, NULL, &number);
 		return number ^ 0xF0000000;
 	}
+	return 0;
+}
+
+/*++
+Description:
+	get release version number of win10.
+	in compatible mode, return real version.
+Arguments:
+	void
+Return:
+	build number, failed return 0
+--*/
+DWORD OsReleaseNumber()
+{
+	/*
+	//c++11
+	std::map<DWORD, DWORD> tables = {
+		{ 17763, 1507 }, { 10586, 1511} ,{ 14393, 1607 } ,{ 15063, 1703 } ,{ 16299, 1709 } ,{ 17134, 1803 } ,
+		{ 17763, 1809 }, { 18362, 1903 } ,{ 18363, 1909 }
+	};*/
+
+	std::pair<DWORD, DWORD> pairs[] = {
+		std::make_pair(17763,1507),
+		std::make_pair(10586, 1511),
+		std::make_pair(14393, 1607),
+		std::make_pair(15063, 1703),
+		std::make_pair(16299, 1709),
+		std::make_pair(17134, 1803),
+		std::make_pair(17763, 1809),
+		std::make_pair(18362, 1903),
+		std::make_pair(18363, 1909),
+	};
+	std::map<DWORD, DWORD> tables(pairs, pairs+_countof(pairs));
+
+	DWORD build = OsBuildNumber();
+	auto it = tables.find(build);
+	if (it != tables.end())
+		return it->second;
 	return 0;
 }
 

@@ -40,6 +40,7 @@ UNONE_API bool OsIsVistaUpper();
 UNONE_API DWORD OsMajorVer();
 UNONE_API DWORD OsMinorVer();
 UNONE_API DWORD OsBuildNumber();
+UNONE_API DWORD OsReleaseNumber();
 UNONE_API std::string OsNetBiosNameA();
 UNONE_API std::wstring OsNetBiosNameW();
 UNONE_API std::string OsHostNameA();
