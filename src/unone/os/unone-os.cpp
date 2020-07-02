@@ -23,10 +23,19 @@
 #include <native/unone-native.h>
 #include <internal/unone-internal.h>
 #include <string/unone-str.h>
+#include <security/unone-se.h>
 #include "unone-os.h"
 
 namespace {
+typedef enum _SHUTDOWN_ACTION {
+	ShutdownNoReboot,
+	ShutdownReboot,
+	ShutdownPowerOff
+} SHUTDOWN_ACTION;
 
+typedef NTSTATUS(NTAPI *__NtShutdownSystem)(
+	__in SHUTDOWN_ACTION Action
+	);
 }
 
 namespace UNONE {
@@ -139,7 +148,7 @@ DWORD OsReleaseNumber()
 	//c++11
 	std::map<DWORD, DWORD> tables = {
 		{ 10240, 1507 }, { 10586, 1511} ,{ 14393, 1607 } ,{ 15063, 1703 } ,{ 16299, 1709 } ,{ 17134, 1803 } ,
-		{ 17763, 1809 }, { 18362, 1903 } ,{ 18363, 1909 }
+		{ 17763, 1809 }, { 18362, 1903 } ,{ 18363, 1909 } ,{ 19041, 2004 }
 	};*/
 
 	std::pair<DWORD, DWORD> pairs[] = {
@@ -152,6 +161,7 @@ DWORD OsReleaseNumber()
 		std::make_pair(17763, 1809),
 		std::make_pair(18362, 1903),
 		std::make_pair(18363, 1909),
+		std::make_pair(19041, 2004),
 	};
 	std::map<DWORD, DWORD> tables(pairs, pairs+_countof(pairs));
 
@@ -510,5 +520,51 @@ std::wstring OsDosErrorMsgW(__in DWORD err)
 	return wstr;
 }
 
+/*++
+Description:
+	fast reboot
+Arguments:
+	void
+Return:
+	bool
+--*/
+bool OsFastReboot()
+{
+	NTSTATUS status;
+	__NtShutdownSystem shutdown_api = (__NtShutdownSystem)
+		GetProcAddress(GetModuleHandleA("ntdll.dll"), "NtShutdownSystem");
+	if (shutdown_api == NULL) {
+		return false;
+	}
+	SeEnablePrivilege(SE_SHUTDOWN_NAME);
+	status = shutdown_api(ShutdownReboot);
+	if (!NT_SUCCESS(status)) {
+		return false;
+	}
+	return true;
+}
 
+/*++
+Description:
+	fast power off
+Arguments:
+	void
+Return:
+	bool
+--*/
+bool OsFastPoweroff()
+{
+	NTSTATUS status;
+	__NtShutdownSystem shutdown_api = (__NtShutdownSystem)
+		GetProcAddress(GetModuleHandleA("ntdll.dll"), "NtShutdownSystem");
+	if (shutdown_api == NULL) {
+		return false;
+	}
+	UNONE::SeEnablePrivilege(SE_SHUTDOWN_NAME);
+	status = shutdown_api(ShutdownPowerOff);
+	if (!NT_SUCCESS(status)) {
+		return false;
+	}
+	return true;
+}
 }

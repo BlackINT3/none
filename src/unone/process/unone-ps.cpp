@@ -1531,7 +1531,7 @@ bool PsKillProcess(__in DWORD pid)
 	bool result = false;
 	HANDLE phd = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
 	if (phd) {
-		if (TerminateProcess(phd, 0))
+		if (TerminateProcess(phd, 1))
 			result = true;
 		CloseHandle(phd);
 	}
