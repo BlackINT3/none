@@ -1,7 +1,7 @@
 nuget {    
     nuspec {
         id = knone-wdk71;
-        version : 1.0.0;
+        version : 1.0.1;
         title: knone-wdk71;
         authors: BlackINT3;
         owners: BlackINT3;

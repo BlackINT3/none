@@ -46,8 +46,7 @@ NTOS_VERSION OsNtVersion()
 			return NTOS_WIN2003;
 		}
 		break;
-	}
-	case 6: {
+	} case 6: {
 		if (info.dwMinorVersion == 0) {
 			if (info.wServicePackMajor == 1) return NTOS_WINVISTASP1;
 			if (info.wServicePackMajor == 2) return NTOS_WINVISTASP2;
@@ -64,8 +63,7 @@ NTOS_VERSION OsNtVersion()
 			return NTOS_WIN81;
 		}
 		break;
-	}
-	case 10: {
+	} case 10: {
 		if (info.dwBuildNumber == 10240) return NTOS_WIN10_1507;
 		if (info.dwBuildNumber == 10586) return NTOS_WIN10_1511;
 		if (info.dwBuildNumber == 14393) return NTOS_WIN10_1607;
@@ -74,6 +72,8 @@ NTOS_VERSION OsNtVersion()
 		if (info.dwBuildNumber == 17134) return NTOS_WIN10_1803;
 		if (info.dwBuildNumber == 17763) return NTOS_WIN10_1809;
 		if (info.dwBuildNumber == 18362) return NTOS_WIN10_1903;
+		if (info.dwBuildNumber == 18363) return NTOS_WIN10_1909;
+		if (info.dwBuildNumber == 19041) return NTOS_WIN10_2004;
 	}
 	default:
 		break;

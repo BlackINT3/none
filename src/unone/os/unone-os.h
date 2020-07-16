@@ -62,5 +62,6 @@ UNONE_API std::wstring OsEnvironmentW(const std::wstring &env);
 UNONE_API DWORD OsNtToDosError(__in LONG status);
 UNONE_API std::string OsDosErrorMsgA(__in DWORD err);
 UNONE_API std::wstring OsDosErrorMsgW(__in DWORD err);
-
+UNONE_API bool OsFastReboot();
+UNONE_API bool OsFastPoweroff();
 } // namespace UNONE
