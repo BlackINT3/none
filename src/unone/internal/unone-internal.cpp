@@ -23,6 +23,38 @@ namespace UNONE {
 typedef std::stack<LogCallback> LoggerType;
 DWORD global_idx = TLS_OUT_OF_INDEXES;
 
+bool InterCreateTlsValue(LPVOID val, DWORD &tlsid)
+{
+	DWORD idx = tlsid;
+	if (idx == TLS_OUT_OF_INDEXES) {
+		idx = TlsAlloc();
+	}
+	if (idx == TLS_OUT_OF_INDEXES) return false;
+	tlsid = idx;
+	bool ret = TlsSetValue(idx, val);
+	if (!ret) {
+		TlsFree(idx);
+		return false;
+	}
+	return true;
+}
+
+bool InterGetTlsValue(DWORD tlsid, LPVOID &val)
+{
+	if (tlsid == TLS_OUT_OF_INDEXES) return false;
+	val = TlsGetValue(tlsid);
+	return true;
+}
+
+bool InterDeleteTlsValue(DWORD &tlsid)
+{
+	if (tlsid == TLS_OUT_OF_INDEXES) return false;
+	TlsSetValue(tlsid, nullptr);
+	TlsFree(tlsid);
+	tlsid = TLS_OUT_OF_INDEXES;
+	return true;
+}
+
 bool InterRegisterLogger(__in LogCallback routine)
 {
 	LoggerType *loggers = nullptr;

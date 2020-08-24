@@ -22,6 +22,8 @@
 
 namespace UNONE {
 	
+extern DWORD PROCESS_VID;
+
 #define INVALID_PID -1
 #define INVALID_TID -1
 
@@ -158,10 +160,11 @@ UNONE_API bool PsGetModulesInfoW(__in DWORD pid, __out std::vector<MODULE_BASE_I
 
 UNONE_API std::string PsGetProcessNameA(__in DWORD pid = GetCurrentProcessId());
 UNONE_API std::wstring PsGetProcessNameW(__in DWORD pid = GetCurrentProcessId());
-UNONE_API std::string PsGetProcessPathA(__in DWORD pid = GetCurrentProcessId());
-UNONE_API std::wstring PsGetProcessPathW(__in DWORD pid = GetCurrentProcessId());
 UNONE_API std::string PsGetProcessDirA(__in DWORD pid = GetCurrentProcessId());
 UNONE_API std::wstring PsGetProcessDirW(__in DWORD pid = GetCurrentProcessId());
+UNONE_API std::string PsGetProcessPathA(__in DWORD pid = GetCurrentProcessId());
+UNONE_API std::wstring PsGetProcessPathW(__in DWORD pid = GetCurrentProcessId());
+
 UNONE_API HMODULE PsGetModuleBaseA(__in const std::string &name, __in PVOID addr = PsIsX64);
 UNONE_API HMODULE PsGetModuleBaseW(__in const std::wstring &name, __in PVOID addr = PsIsX64);
 UNONE_API std::string PsGetModuleNameA(__in HMODULE base = NULL);

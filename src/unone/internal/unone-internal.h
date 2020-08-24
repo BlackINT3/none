@@ -16,6 +16,7 @@
 #pragma once
 #include <functional>
 #include <string>
+#include <Windows.h>
 
 #ifdef UNONE_DLL
 #define UNONE_API __declspec(dllexport)
@@ -65,6 +66,10 @@ enum LogOuputLevel {
 	LevelDbg,
 	LevelFatal,
 };
+
+bool InterCreateTlsValue(LPVOID val, DWORD &tlsid);
+bool InterGetTlsValue(DWORD tlsid, LPVOID &val);
+bool InterDeleteTlsValue(DWORD &tlsid);
 
 bool InterRegisterLogger(__in LogCallback routine);
 bool InterUnregisterLogger();

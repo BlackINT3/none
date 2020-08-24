@@ -29,7 +29,25 @@
 #include "wow64/wow64ext.h"
 #include "unone-ps.h"
 
+DWORD UNONE::PROCESS_VID = TLS_OUT_OF_INDEXES;
+
 namespace {
+
+// internal vopen
+HANDLE WINAPI VirtualOpenProcess( _In_ DWORD dwDesiredAccess, _In_ BOOL bInheritHandle, _In_ DWORD dwProcessId )
+{
+	typedef HANDLE(WINAPI *pOpenProcess)(_In_ DWORD dwDesiredAccess, _In_ BOOL bInheritHandle, _In_ DWORD dwProcessId);
+
+	if (UNONE::PROCESS_VID != TLS_OUT_OF_INDEXES) {
+		LPVOID vopen = nullptr;
+		UNONE::InterGetTlsValue(UNONE::PROCESS_VID, vopen);
+		if (vopen) {
+			return ((pOpenProcess)vopen)(dwDesiredAccess, bInheritHandle, dwProcessId);
+		}
+	}
+
+	return OpenProcess(dwDesiredAccess, bInheritHandle, dwProcessId);
+}
 
 //internal: suspend normal
 DWORD PsSuspendNormalThread(DWORD tid)
@@ -119,7 +137,6 @@ FORCEINLINE PVOID GetReadRoutine64()
 }
 
 namespace UNONE {
-
 /*++
 Description:
 	check process is running under wow64 by process handle.
@@ -155,7 +172,7 @@ Return:
 bool PsIsWow64(__in DWORD pid)
 {
 	bool result = false;
-	HANDLE process = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
+	HANDLE process = VirtualOpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
 	if (process) {
 		result = PsIsWow64(process);
 		CloseHandle(process);
@@ -299,7 +316,7 @@ Return:
 bool PsIsDeleted(__in DWORD pid)
 {
 	bool result = false;
-	HANDLE phd = OpenProcess(SYNCHRONIZE, FALSE, pid);
+	HANDLE phd = VirtualOpenProcess(SYNCHRONIZE, FALSE, pid);
 	if (phd) {
 		if (WaitForSingleObject(phd, 0) == WAIT_OBJECT_0)	//signal
 			result = true;
@@ -430,7 +447,7 @@ Return:
 DWORD PsGetParentPid(__in DWORD pid)
 {
 	DWORD ppid = INVALID_PID;
-	HANDLE process = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
+	HANDLE process = VirtualOpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
 	if (!process) return INVALID_PID;
 	if (PsIsX64(pid)) {
 		PROCESS_BASIC_INFORMATION64 pbi64;
@@ -589,9 +606,9 @@ bool PsGetProcessInfo32W(__in DWORD pid, __out PROCESS_BASE_INFOW &info)
 	if (!read_routine) return false;
 
 	NTSTATUS status = STATUS_SUCCESS;
-	HANDLE phd = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
+	HANDLE phd = VirtualOpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
 	if (!phd) {
-		UNONE_ERROR("OpenProcess pid:%d err:%d", pid, GetLastError());
+		UNONE_ERROR("VirtualOpenProcess pid:%d err:%d", pid, GetLastError());
 		return false;
 	}
 	do {
@@ -662,9 +679,9 @@ bool PsGetProcessInfo64W(__in DWORD pid, __out PROCESS_BASE_INFOW &info)
 	if (!read_routine) return false;
 
 	NTSTATUS status = STATUS_SUCCESS;
-	HANDLE phd = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
+	HANDLE phd = VirtualOpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
 	if (!phd) {
-		UNONE_ERROR(L"OpenProcess pid:%d err:%d", pid, GetLastError());
+		UNONE_ERROR(L"VirtualOpenProcess pid:%d err:%d", pid, GetLastError());
 		return false;
 	}
 	do {
@@ -779,9 +796,9 @@ bool PsGetModulesInfo32W(__in DWORD pid, __out std::vector<MODULE_BASE_INFOW> &i
 	if (!read_routine) return false;
 
 	NTSTATUS status = STATUS_SUCCESS;
-	HANDLE phd = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
+	HANDLE phd = VirtualOpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
 	if (!phd) {
-		UNONE_ERROR(L"OpenProcess pid:%d err:%d", pid, GetLastError());
+		UNONE_ERROR(L"VirtualOpenProcess pid:%d err:%d", pid, GetLastError());
 		return false;
 	}
 	do {
@@ -882,9 +899,9 @@ bool PsGetModulesInfo64W(__in DWORD pid, __out std::vector<MODULE_BASE_INFOW> &i
 	if (!read_routine) return false;
 
 	NTSTATUS status = STATUS_SUCCESS;
-	HANDLE phd = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
+	HANDLE phd = VirtualOpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
 	if (!phd) {
-		UNONE_ERROR(L"OpenProcess pid:%d err:%d", pid, GetLastError());
+		UNONE_ERROR(L"VirtualOpenProcess pid:%d err:%d", pid, GetLastError());
 		return false;
 	}
 	do {
@@ -1011,6 +1028,32 @@ std::wstring PsGetProcessNameW(__in DWORD pid)
 
 /*++
 Description:
+get process dir
+Arguments:
+pid - process id
+Return:
+process dir
+--*/
+std::string PsGetProcessDirA(__in DWORD pid)
+{
+	return StrToA(PsGetProcessDirW(pid));
+}
+
+/*++
+Description:
+get process dir
+Arguments:
+pid - process id
+Return:
+process dir
+--*/
+std::wstring PsGetProcessDirW(__in DWORD pid)
+{
+	return FsPathToDirW(PsGetProcessPathW(pid));
+}
+
+/*++
+Description:
 	get process full path
 Arguments:
 	pid - process id
@@ -1039,7 +1082,7 @@ std::wstring PsGetProcessPathW(__in DWORD pid)
 	if (pid == 4) return L"System";
 
 	HANDLE phd = NULL;
-	phd = OpenProcess(PROCESS_QUERY_INFORMATION|PROCESS_VM_READ, FALSE, pid);
+	phd = VirtualOpenProcess(PROCESS_QUERY_INFORMATION|PROCESS_VM_READ, FALSE, pid);
 	if (phd != NULL) {
 		if (GetModuleFileNameExW(phd, NULL, path, path_size) != 0) {
 			CloseHandle(phd);
@@ -1048,9 +1091,9 @@ std::wstring PsGetProcessPathW(__in DWORD pid)
 	}
 
 	if (phd == NULL)
-		phd = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
+		phd = VirtualOpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
 	if (phd == NULL) {
-		UNONE_ERROR(L"OpenProcess pid:%d err:%d", pid, GetLastError());
+		UNONE_ERROR(L"VirtualOpenProcess pid:%d err:%d", pid, GetLastError());
 		return L"";
 	}
 	if (GetProcessImageFileNameW(phd, path, path_size) == 0) {
@@ -1062,32 +1105,6 @@ std::wstring PsGetProcessPathW(__in DWORD pid)
 	std::wstring dos_path;
 	ObParseToDosPathW(path, dos_path);
 	return dos_path;
-}
-
-/*++
-Description:
-	get process dir
-Arguments:
-	pid - process id
-Return:
-	process dir
---*/
-std::string PsGetProcessDirA(__in DWORD pid)
-{
-	return StrToA(PsGetProcessDirW(pid));
-}
-
-/*++
-Description:
-	get process dir
-Arguments:
-	pid - process id
-Return:
-	process dir
---*/
-std::wstring PsGetProcessDirW(__in DWORD pid)
-{
-	return FsPathToDirW(PsGetProcessPathW(pid));
 }
 
 /*++
@@ -1492,9 +1509,9 @@ Return:
 --*/
 bool PsEnumMemory(__in DWORD pid, __in MemoryCallback memory_cb)
 {
-	HANDLE phd = OpenProcess(PROCESS_VM_OPERATION | PROCESS_QUERY_INFORMATION, FALSE, pid);
+	HANDLE phd = VirtualOpenProcess(PROCESS_VM_OPERATION | PROCESS_QUERY_INFORMATION, FALSE, pid);
 	if (!phd) {
-		UNONE_ERROR("OpenProcess pid:%d err:%d", pid, GetLastError());
+		UNONE_ERROR("VirtualOpenProcess pid:%d err:%d", pid, GetLastError());
 		return false;
 	}
 	SYSTEM_INFO sysinfo;
@@ -1529,7 +1546,7 @@ Return:
 bool PsKillProcess(__in DWORD pid)
 {
 	bool result = false;
-	HANDLE phd = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
+	HANDLE phd = VirtualOpenProcess(PROCESS_TERMINATE, FALSE, pid);
 	if (phd) {
 		if (TerminateProcess(phd, 1))
 			result = true;
@@ -1704,7 +1721,7 @@ bool PsSuspendProcess(__in DWORD pid)
 	HMODULE ntdll = GetModuleHandleW(L"ntdll.dll");
 	__NtSuspendProcess pNtSuspendProcess = (__NtSuspendProcess)GetProcAddress(ntdll,"NtSuspendProcess");
 	if (pNtSuspendProcess) {
-		HANDLE phd = OpenProcess(PROCESS_SUSPEND_RESUME, FALSE, pid);
+		HANDLE phd = VirtualOpenProcess(PROCESS_SUSPEND_RESUME, FALSE, pid);
 		if (phd) {
 			if (NT_SUCCESS(pNtSuspendProcess(phd)))
 				result = true;
@@ -1728,7 +1745,7 @@ bool PsResumeProcess(__in DWORD pid)
 	HMODULE ntdll = GetModuleHandleW(L"ntdll.dll");
 	__NtResumeProcess pNtResumeProcess = (__NtResumeProcess)GetProcAddress(ntdll,"NtResumeProcess");
 	if (pNtResumeProcess) {
-		HANDLE phd = OpenProcess(PROCESS_SUSPEND_RESUME, FALSE, pid);
+		HANDLE phd = VirtualOpenProcess(PROCESS_SUSPEND_RESUME, FALSE, pid);
 		if (phd) {
 			if (NT_SUCCESS(pNtResumeProcess(phd)))
 				result = true;
