@@ -1,7 +1,7 @@
 nuget {    
     nuspec {
         id = unone-vs2015;
-        version : 1.0.2;
+        version : 1.0.3;
         title: unone-vs2015;
         authors: BlackINT3;
         owners: BlackINT3;

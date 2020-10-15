@@ -262,6 +262,68 @@ bool ObParseToNtPathW(__in std::wstring ori_path, __out std::wstring& nt_path)
 	nt_path = target + rel;
 	return true;
 }
+
+
+
+/*++
+Description:
+	load driver registry
+Arguments:
+	file_path - driver file path
+	srv_name - driver service name
+Return:
+	bool
+--*/
+bool ObLoadDriverRegistryW(__in const std::wstring &file_path, __in std::wstring srv_name)
+{
+	HKEY subkey = NULL;
+	do {
+		std::wstring driver_path = UNONE::FsPathStandardW(L"\\??\\" + file_path);
+		DWORD dispos;
+		std::wstring key_name = L"SYSTEM\\CurrentControlSet\\services\\" + srv_name;
+		LONG result = RegCreateKeyExW(HKEY_LOCAL_MACHINE, key_name.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &subkey, &dispos);
+		if (result != ERROR_SUCCESS) {
+			UNONE_ERROR(L"RegCreateKeyExW %s err:%d", key_name.c_str(), result);
+			return false;
+		}
+		DWORD start = SERVICE_DEMAND_START;
+		result = RegSetValueExW(subkey, L"Start", 0, REG_DWORD, (BYTE*)&start, sizeof(start));
+		if (result != ERROR_SUCCESS) {
+			UNONE_ERROR(L"RegSetValueW err:%d", result);
+			break;
+		}
+
+		DWORD type = SERVICE_KERNEL_DRIVER;
+		result = RegSetValueExW(subkey, L"Type", 0, REG_DWORD, (BYTE*)&type, sizeof(type));
+		if (result != ERROR_SUCCESS) {
+			UNONE_ERROR(L"RegSetValueW err:%d", result);
+			break;
+		}
+
+		DWORD errctl = SERVICE_ERROR_NORMAL;
+		result = RegSetValueExW(subkey, L"ErrorControl", 0, REG_DWORD, (BYTE*)&errctl, sizeof(errctl));
+		if (result != ERROR_SUCCESS) {
+			UNONE_ERROR(L"RegSetValueW err:%d", result);
+			break;
+		}
+
+		result = RegSetValueExW(subkey, L"ImagePath", 0, REG_EXPAND_SZ, (BYTE*)driver_path.c_str(), (DWORD)driver_path.size() * 2);
+		if (result != ERROR_SUCCESS) {
+			UNONE_ERROR(L"RegSetValueW err:%d", result);
+			break;
+		}
+	} while (0);
+	if (subkey)	RegCloseKey(subkey);
+	return true;
+}
+
+bool ObUnloadDriverW(__in const std::wstring &srv_name)
+{
+	std::wstring key_name = L"SYSTEM\\CurrentControlSet\\services\\" + srv_name;
+	SHDeleteKeyW(HKEY_LOCAL_MACHINE, key_name.c_str());
+	return true;
+}
+
 /*++
 Description:
 	load driver
@@ -298,39 +360,7 @@ bool ObLoadDriverW(__in const std::wstring &file_path, __in std::wstring srv_nam
 	auto pNtLoadDriver = (__NtLoadDriver)GetProcAddress(ntdll, "NtLoadDriver");
 	if (!pNtLoadDriver) return false;
 
-	std::wstring driver_path = UNONE::FsPathStandardW(L"\\??\\" + file_path);
-	HKEY subkey;
-	DWORD dispos;
-	std::wstring key_name = L"SYSTEM\\CurrentControlSet\\services\\" + srv_name;
-	LONG result = RegCreateKeyExW(HKEY_LOCAL_MACHINE, key_name.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &subkey, &dispos);
-	if (result != ERROR_SUCCESS) {
-		UNONE_ERROR(L"RegCreateKeyExW %s err:%d", key_name.c_str(), result);
-		return false;
-	}
-	DWORD start = SERVICE_DEMAND_START;
-	result = RegSetValueExW(subkey, L"Start", 0, REG_DWORD, (BYTE*)&start, sizeof(start));
-	if (result != ERROR_SUCCESS) {
-		UNONE_ERROR(L"RegSetValueW err:%d", result);
-	}
 
-	DWORD type = SERVICE_KERNEL_DRIVER;
-	result = RegSetValueExW(subkey, L"Type", 0, REG_DWORD, (BYTE*)&type, sizeof(type));
-	if (result != ERROR_SUCCESS) {
-		UNONE_ERROR(L"RegSetValueW err:%d", result);
-	}
-
-	DWORD errctl = SERVICE_ERROR_NORMAL;
-	result = RegSetValueExW(subkey, L"ErrorControl", 0, REG_DWORD, (BYTE*)&errctl, sizeof(errctl));
-	if (result != ERROR_SUCCESS) {
-		UNONE_ERROR(L"RegSetValueW err:%d", result);
-	}
-
-	result = RegSetValueExW(subkey, L"ImagePath", 0, REG_EXPAND_SZ, (BYTE*)driver_path.c_str(), (DWORD)driver_path.size()*2);
-	if (result != ERROR_SUCCESS) {
-		UNONE_ERROR(L"RegSetValueW err:%d", result);
-	}
-
-	RegCloseKey(subkey);
 
 	bool ret = true;
 	NTSTATUS status;
