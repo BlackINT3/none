@@ -317,13 +317,6 @@ bool ObLoadDriverRegistryW(__in const std::wstring &file_path, __in std::wstring
 	return true;
 }
 
-bool ObUnloadDriverW(__in const std::wstring &srv_name)
-{
-	std::wstring key_name = L"SYSTEM\\CurrentControlSet\\services\\" + srv_name;
-	SHDeleteKeyW(HKEY_LOCAL_MACHINE, key_name.c_str());
-	return true;
-}
-
 /*++
 Description:
 	load driver
@@ -370,7 +363,6 @@ bool ObLoadDriverW(__in const std::wstring &file_path, __in std::wstring srv_nam
 	status = pNtLoadDriver(&ustr);
 	if (!NT_SUCCESS(status)) {
 		UNONE_ERROR(L"NtLoadDriver service:%s err:%x", wstr.c_str(), status);
-		SHDeleteKeyW(HKEY_LOCAL_MACHINE, key_name.c_str());
 		ret = false;
 	}
 	return ret;
