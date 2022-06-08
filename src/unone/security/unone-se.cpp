@@ -286,7 +286,10 @@ Return:
 --*/
 bool SeEnablePrivilegeA(__in const char* priv_name, __in DWORD priv_number)
 {
-	return SeEnablePrivilegeW(StrToW(priv_name).c_str(), priv_number);
+	if (priv_name) {
+		return SeEnablePrivilegeW(StrToW(priv_name).c_str(), priv_number);
+	}
+	return SeEnablePrivilegeW(NULL, priv_number);
 }
 
 /*++
