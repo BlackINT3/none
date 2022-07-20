@@ -28,7 +28,7 @@ namespace {
 //from:https://www.codeproject.com/Articles/1088/Wildcard-string-compare-globbing
 bool WildCmpA(const char *str, const char *wild, bool ci)
 {
-	const char *cp, *mp;
+	const char *cp = NULL, *mp = NULL;
 	while ((*str) && (*wild != '*')) {
 		if (((*wild != *str) && (ci && tolower(*wild) != tolower(*str))) && (*wild != '?')) return false;
 		wild++;
@@ -52,7 +52,7 @@ bool WildCmpA(const char *str, const char *wild, bool ci)
 }
 bool WildCmpW(const wchar_t *str, const wchar_t *wild, bool ci)
 {
-	const wchar_t *cp, *mp;
+	const wchar_t *cp = NULL, *mp = NULL;
 	while ((*str) && (*wild != L'*')) {
 		if (((*wild != *str) && (ci && tolower(*wild) != tolower(*str))) && (*wild != '?')) return false;
 		wild++;

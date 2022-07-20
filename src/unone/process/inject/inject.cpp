@@ -47,7 +47,7 @@ ULONG64 GetLoadLibraryAddress32(DWORD pid)
 		UNONE_ERROR("MapImage %s failed, err:%d", path.c_str(), GetLastError());
 		return NULL;
 	}
-	auto pLoadLibraryW = UNONE::PeGetProcAddress(image, "LoadLibraryW");
+	auto pLoadLibraryW = UNONE::PeGetProcAddress(image, (char*)"LoadLibraryW");
 	UNONE::PeUnmapImage(image);
 	if (pLoadLibraryW == NULL) {
 		UNONE_ERROR("PsGetProcAddress err:%d", GetLastError());

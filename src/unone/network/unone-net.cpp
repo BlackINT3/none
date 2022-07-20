@@ -13,6 +13,7 @@
 ** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 **
 ****************************************************************************/
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <Ws2tcpip.h>
 #include <Windows.h>
 #include <common/unone-common.h>

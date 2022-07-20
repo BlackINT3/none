@@ -111,11 +111,11 @@ void InertLoggerOutput(__in LogOuputLevel lev, __in const char* func, __in const
 
 	std::wstring levelstr;
 	struct { int lev; wchar_t* levstr; } levels[] = {
-		{ LevelInfo , L"[INFO]" },
-		{ LevelWarn , L"[WARN]" },
-		{ LevelErr , L"[ERR]" },
-		{ LevelDbg , L"[DBG]" },
-		{ LevelFatal , L"[FATAL]" },
+		{ LevelInfo , (wchar_t*)L"[INFO]" },
+		{ LevelWarn , (wchar_t*)L"[WARN]" },
+		{ LevelErr , (wchar_t*)L"[ERR]" },
+		{ LevelDbg , (wchar_t*)L"[DBG]" },
+		{ LevelFatal , (wchar_t*)L"[FATAL]" },
 	};
 	for (int i = 0; i < _countof(levels); i++) {
 		if (levels[i].lev == lev) {

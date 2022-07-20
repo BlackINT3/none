@@ -89,7 +89,8 @@ Return:
 time_t TmMsToUnixTime(__in LONGLONG ms)
 {
 	time_t unix;
-	TmSystemToUnixTime(TmMsToSystemTime(ms), unix);
+	SYSTEMTIME tm = TmMsToSystemTime(ms);
+	TmSystemToUnixTime(tm, unix);
 	return unix;
 }
 
