@@ -530,4 +530,52 @@ PIMAGE_THUNK_DATA PeGetImportThunkData(CHAR* base, CHAR* dll_name, CHAR* func_na
 	return found_thunk;
 }
 
+
+/*++
+Description:
+	check elf is x64
+Arguments:
+	base - image/file base
+Return:
+	BOOL
+--*/
+bool ElfX64(__in CHAR* base)
+{
+	UCHAR* e_ident = ELF_HEADER32(base)->e_ident;
+	return e_ident[4] == ELFCLASS64;
+}
+
+/*++
+Description:
+	check elf is valid
+Arguments:
+	base - image/file base
+Return:
+	BOOL
+--*/
+bool ElfValid(__in CHAR* base)
+{
+	__try {
+		UCHAR* e_ident = ELF_HEADER32(base)->e_ident;
+		return memcmp(e_ident, ELFMAG, sizeof(ELFMAG)-1) == 0;
+	} __except (EXCEPTION_EXECUTE_HANDLER) {
+		return false;
+	}
+}
+/*++
+Description:
+	get entry point
+Arguments:
+	base - image/file base
+Return:
+	entry point
+--*/
+DWORD64 ElfGetEntryPoint(__in CHAR* base)
+{
+	if (!ElfValid(base)) return 0;
+	if (ELF_X64(base))
+		return ELF_HEADER64(base)->e_entry;
+	else
+		return ELF_HEADER32(base)->e_entry;
+}
 } // namespace UNONE
