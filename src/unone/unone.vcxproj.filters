@@ -70,6 +70,9 @@
     <Filter Include="plugins\cryptor\rc-wrapper">
       <UniqueIdentifier>{82ee1229-7c14-4f41-9a46-092f16807309}</UniqueIdentifier>
     </Filter>
+    <Filter Include="pe\elf">
+      <UniqueIdentifier>{d55a16db-ca77-4b73-811f-a278f1aa00ff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="unone.cpp" />
@@ -147,6 +150,9 @@
     </ClCompile>
     <ClCompile Include="plugins\cryptor\base-wrapper\base-wrapper.cpp">
       <Filter>plugins\cryptor\base-wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="pe\elf\elf-parser.cpp">
+      <Filter>pe\elf</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -231,6 +237,12 @@
     </ClInclude>
     <ClInclude Include="plugins\cryptor\base-wrapper\base-wrapper.h">
       <Filter>plugins\cryptor\base-wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="pe\elf\elf.h">
+      <Filter>pe\elf</Filter>
+    </ClInclude>
+    <ClInclude Include="pe\elf\elf-parser.h">
+      <Filter>pe\elf</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

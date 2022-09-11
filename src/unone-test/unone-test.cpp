@@ -40,15 +40,22 @@ int MiniTest(int argc, char* argv[])
 	//UNONE::PsInjectByRemoteThreadW(9808, LR"("I:\demo\inject - demo64.dll")");
 	using namespace UNONE::Plugins::Cryptor;
 
+/*
 	std::string hash;
 	hash = "123";
 	printf("%s\n", Base64Decode(Base64Encode(hash)).c_str());
 	RC4("213", hash);
 	hash = UNONE::StrStreamToHexStrA(hash);
-	printf("%s", hash.c_str());
+	printf("%s", hash.c_str());*/
 
+	std::string data;
+	UNONE::FsReadFileDataA("c:\\test\\libc64.so", data);
+	CHAR* elf = (CHAR*)data.c_str();
+	auto is_valid = UNONE::ElfValid(elf); printf("is_valid: %d\n", is_valid);
+	auto is_x64 = UNONE::ElfX64(elf); printf("is_x64: %d\n", is_x64);
+	auto oep = UNONE::ElfGetEntryPoint(elf); printf("oep: 0x%llx\n", oep);
 
-	std::cin >> argc;
+	//std::cin >> argc;
 	return 0;
 }
 
@@ -60,6 +67,6 @@ int main(int argc, char* argv[])
 	
 	MiniTest(argc, argv);
 
-	UnitTest(argc, argv);
+	//UnitTest(argc, argv);
 }
 

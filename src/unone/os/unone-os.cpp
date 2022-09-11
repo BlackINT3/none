@@ -24,6 +24,7 @@
 #include <internal/unone-internal.h>
 #include <string/unone-str.h>
 #include <security/unone-se.h>
+#include <time/unone-tm.h>
 #include "unone-os.h"
 
 namespace {
@@ -425,6 +426,63 @@ std::wstring OsSyswow64DirW()
 		wstr.append(L"\\SysWOW64");
 	}
 	return wstr;
+}
+
+/*++
+Description:
+	get tickcount whatever os
+Arguments:
+	void
+Return:
+	tickcount
+--*/
+uint64_t OsTickCount()
+{
+	uint64_t ticks;
+	typedef ULONGLONG(WINAPI* _GetTickCount64)();
+	_GetTickCount64 pGetTickCount64 = (_GetTickCount64)GetProcAddress(GetModuleHandleA("kernel32"), "GetTickCount64");
+	if (!pGetTickCount64) {
+		ticks = (uint64_t)GetTickCount();
+	} else {
+		ticks = (uint64_t)pGetTickCount64();
+	}
+	return ticks;
+}
+
+/*++
+Description:
+	get startup time
+Arguments:
+	void
+Return:
+	ms
+--*/
+LONGLONG OsStartupTime()
+{
+	FILETIME		Filetime;
+	SYSTEMTIME		Systime;
+	ULARGE_INTEGER  *ui = (ULARGE_INTEGER*)&Filetime;
+	GetSystemTime(&Systime);
+	Filetime = TmSystemTimeToFile(Systime);
+	ui->QuadPart -= OsTickCount() * 10000;
+	return TmFileTimeToMs(Filetime);
+}
+
+/*++
+Description:
+	get startup time string
+Arguments:
+	format
+Return:
+	str
+--*/
+std::string OsStartupTimeStrA(const std::string& format)
+{
+	return StrToA(OsStartupTimeStrW(StrToW(format)));
+}
+std::wstring OsStartupTimeStrW(const std::wstring& format)
+{
+	return TmFormatMsW(OsStartupTime(), format, NULL);
 }
 
 /*++

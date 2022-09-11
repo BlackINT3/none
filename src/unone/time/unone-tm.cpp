@@ -31,17 +31,18 @@ Arguments:
 	systm - system time
 	unixtm - unix timestamp
 Return:
-	bool
+	time_t , fail to 0
 --*/
-bool TmSystemToUnixTime(__in SYSTEMTIME& systm, __out time_t& unixtm)
+UNONE_API time_t TmSystemToUnixTime(__in SYSTEMTIME& systm)
 {
+	time_t unixtm = 0;
 	LARGE_INTEGER unix_utc = {0};
 	LARGE_INTEGER filetm = {0};
 	unix_utc.QuadPart = 116444736000000000I64;
 	if (!SystemTimeToFileTime(&systm, (FILETIME*)&filetm))
 		return false;
 	unixtm = (time_t)((filetm.QuadPart - unix_utc.QuadPart) / 10000000);
-	return true;
+	return unixtm;
 }
 
 /*++
@@ -51,17 +52,18 @@ Arguments:
 	unixtm - unix timestamp
 	systm - system time
 Return:
-	bool
+	SYSTEMTIME, fail to 0
 --*/
-bool TmUnixToSystemTime(__in time_t unixtm, __out SYSTEMTIME& systm)
+SYSTEMTIME TmUnixToSystemTime(__in time_t unixtm)
 {
+	SYSTEMTIME systm = {0};
 	LARGE_INTEGER unix_utc = {0};
 	LARGE_INTEGER filetm = {0};
 	unix_utc.QuadPart = 116444736000000000I64;
 	filetm.QuadPart = (unsigned __int64)unixtm * 10000000 + unix_utc.QuadPart;
 	FileTimeToSystemTime((FILETIME*)&filetm, &systm);
-	TmConvertZoneTime(systm, NULL);
-	return true;
+	systm = TmConvertZoneTime(systm, NULL);
+	return systm;
 }
 
 /*++
@@ -73,9 +75,10 @@ Arguments:
 Return:
 	bool
 --*/
-bool TmConvertZoneTime(__inout SYSTEMTIME& systm, __in LPTIME_ZONE_INFORMATION zone)
+UNONE_API SYSTEMTIME TmConvertZoneTime(__in SYSTEMTIME systm, __in LPTIME_ZONE_INFORMATION zone)
 {
-	return SystemTimeToTzSpecificLocalTime(zone, &systm, &systm) ? true : false;
+	SystemTimeToTzSpecificLocalTime(zone, &systm, &systm);
+	return systm;
 }
 
 /*++
@@ -88,11 +91,7 @@ Return:
 --*/
 time_t TmMsToUnixTime(__in LONGLONG ms)
 {
-	time_t unix;
-	SYSTEMTIME tm = TmMsToSystemTime(ms);
-	TmSystemToUnixTime(tm, unix);
-	return unix;
-}
+return TmSystemToUnixTime(TmMsToSystemTime(ms));}
 
 /*++
 Description:
@@ -130,6 +129,58 @@ SYSTEMTIME TmMsToSystemTime(__in LONGLONG ms)
 
 /*++
 Description:
+	full time
+Arguments:
+	ms - millisecond
+Return:
+	system time
+--*/
+SYSTEMTIME TmMsToFullTime(__in LONGLONG ms)
+{
+	SYSTEMTIME systm;
+	LONGLONG seconds = ms / 1000;
+	systm.wYear = seconds / (365*24*3600);
+	systm.wMonth = seconds / (30*24*3600);
+	systm.wDay = seconds / (24 * 3600);
+	systm.wHour = seconds / 3600;
+	systm.wMinute = seconds / 60;
+	systm.wSecond = seconds;
+	return systm;
+}
+
+/*++
+Description:
+	file time to system time
+Arguments:
+	ft - file time
+Return:
+	system time
+--*/
+SYSTEMTIME TmFileTimeToSystem(__in const FILETIME& ft)
+{
+	SYSTEMTIME systm;
+	FileTimeToSystemTime(&ft, &systm);
+	return systm;
+}
+
+/*++
+Description:
+	system time to file time
+Arguments:
+	st - system time
+Return:
+	file time
+--*/
+FILETIME TmSystemTimeToFile(__in const SYSTEMTIME& st)
+{
+	FILETIME ft;
+	SystemTimeToFileTime(&st, &ft);
+	return ft;
+}
+
+
+/*++
+Description:
 	unix time to millisecond(1601.01.01)
 Arguments:
 	ms - millisecond
@@ -138,9 +189,7 @@ Return:
 --*/
 LONGLONG TmUnixTimeToMs(__in const time_t& unix)
 {
-	SYSTEMTIME systm;
-	TmUnixToSystemTime(unix, systm);
-	return TmSystemTimeToMs(systm);
+	return TmSystemTimeToMs(TmUnixToSystemTime(unix));
 }
 
 /*++
@@ -199,9 +248,7 @@ Return:
 --*/
 std::wstring TmFormatUnixTimeW(__in const time_t& unix, __in const std::wstring& format)
 {
-	SYSTEMTIME systm;
-	TmUnixToSystemTime(unix, systm);
-	return TmFormatSystemTimeW(systm, format);
+	return TmFormatSystemTimeW(TmUnixToSystemTime(unix), format);
 }
 
 /*++
@@ -232,7 +279,7 @@ Return:
 std::wstring TmFormatMsW(__in LONGLONG ms, __in const std::wstring& format, __in LPTIME_ZONE_INFORMATION zone)
 {
 	SYSTEMTIME systm = TmMsToSystemTime(ms);
-	TmConvertZoneTime(systm, zone);
+	systm = TmConvertZoneTime(systm, zone);
 	return TmFormatSystemTimeW(systm, format);
 }
 

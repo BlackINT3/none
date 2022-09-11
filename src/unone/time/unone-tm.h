@@ -31,12 +31,15 @@ namespace UNONE {
 #define TmFormatSystemTime TmFormatSystemTimeA
 #endif // _UNICODE
 
-UNONE_API bool TmSystemToUnixTime(__in SYSTEMTIME& systm, __out time_t& unixtm);
-UNONE_API bool TmUnixToSystemTime(__in time_t unixtm, __out SYSTEMTIME& systm);
-UNONE_API bool TmConvertZoneTime(__inout SYSTEMTIME& systm, __in LPTIME_ZONE_INFORMATION zone);
+UNONE_API time_t TmSystemToUnixTime(__in SYSTEMTIME& systm);
+UNONE_API SYSTEMTIME TmUnixToSystemTime(__in time_t unixtm);
+UNONE_API SYSTEMTIME TmConvertZoneTime(__in SYSTEMTIME systm, __in LPTIME_ZONE_INFORMATION zone);
 UNONE_API time_t TmMsToUnixTime(__in LONGLONG ms);
 UNONE_API FILETIME TmMsToFileTime(__in LONGLONG ms);
 UNONE_API SYSTEMTIME TmMsToSystemTime(__in LONGLONG ms);
+UNONE_API SYSTEMTIME TmMsToFullTime(__in LONGLONG ms);
+UNONE_API SYSTEMTIME TmFileTimeToSystem(__in const FILETIME& ft);
+UNONE_API FILETIME TmSystemTimeToFile(__in const SYSTEMTIME& st);
 UNONE_API LONGLONG TmUnixTimeToMs(__in const time_t& unix);
 UNONE_API LONGLONG TmFileTimeToMs(__in const FILETIME& ft);
 UNONE_API LONGLONG TmSystemTimeToMs(__in const SYSTEMTIME& systm);

@@ -1791,4 +1791,86 @@ DWORD PsResumeThread(__in DWORD tid)
 	return result;
 }
 
+/*++
+Description:
+	read process console output
+Arguments:
+	cmdline
+	output
+	exitcode
+	flag - FLAG_STDERR | FLAG_STDOUT
+	timeout
+Return:
+	bool
+--*/
+bool PsReadConsoleDataA(const std::string& cmdline, std::string& output, DWORD* exitcode/*NULL*/, DWORD flag, DWORD timeout /*= INFINITE*/)
+{
+	return PsReadConsoleDataW(UNONE::StrToW(cmdline), output, exitcode, timeout);
+}
+bool PsReadConsoleDataW(const std::wstring& cmdline, std::string& output, DWORD* exitcode/*NULL*/, DWORD flag, DWORD timeout /*= INFINITE*/)
+{
+	const int blksize = 512;
+	SECURITY_ATTRIBUTES sa;
+	sa.bInheritHandle = TRUE;
+	sa.lpSecurityDescriptor = NULL;
+	sa.nLength = sizeof(sa);
+	HANDLE rstdin = NULL;
+	HANDLE wstdout = NULL;
+	BOOL ret = CreatePipe(&rstdin, &wstdout, &sa, 64 * 0x1000);
+	if (!ret) return false;
+
+	STARTUPINFOW si = { 0 };
+	PROCESS_INFORMATION pi = { 0 };
+	GetStartupInfoW(&si);
+	si.cb = sizeof(si);
+	si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+	si.wShowWindow = SW_HIDE;
+	if (flag | FLAG_STDOUT) si.hStdOutput = wstdout;
+	if (flag | FLAG_STDERR) si.hStdError = wstdout;
+	si.hStdError = wstdout;
+	ret = CreateProcessW(NULL, (LPWSTR)cmdline.c_str(), NULL, NULL,
+		TRUE, 0, NULL, NULL, &si, &pi);
+	CloseHandle(wstdout);
+	if (!ret) {
+		CloseHandle(rstdin);
+		return false;
+	}
+	if (WaitForSingleObject(pi.hProcess, timeout) == WAIT_TIMEOUT) {
+		TerminateProcess(pi.hProcess, 1);
+		CloseHandle(pi.hThread);
+		CloseHandle(pi.hProcess);
+		CloseHandle(rstdin);
+		return false;
+	}
+	GetExitCodeProcess(pi.hProcess, exitcode);
+
+	CloseHandle(pi.hThread);
+	CloseHandle(pi.hProcess);
+
+	bool result = false;
+	char* buf = new(std::nothrow) char[blksize];
+	if (buf == nullptr) {
+		CloseHandle(rstdin);
+		return false;
+	}
+	while (1) {
+		DWORD readlen = 0;
+		if (ReadFile(rstdin, buf, blksize, &readlen, NULL)) {
+			output.append(buf, readlen);
+			if (blksize > readlen) {
+				result = true;
+				break;
+			}
+		} else {
+			if (GetLastError() == ERROR_BROKEN_PIPE) {
+				result = true;
+				break;
+			}
+		}
+	}
+	CloseHandle(rstdin);
+	delete[] buf;
+	return result;
+}
+
 } // namespace UNONE

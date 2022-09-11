@@ -212,5 +212,9 @@ UNONE_API HANDLE PsInjectByRemoteThread64W(__in DWORD pid, __in const std::wstri
 UNONE_API HANDLE PsInjectByRemoteThreadA(__in DWORD pid, __in const std::string &path);
 UNONE_API HANDLE PsInjectByRemoteThreadW(__in DWORD pid, __in const std::wstring &path);
 
+#define FLAG_STDOUT 0x1
+#define FLAG_STDERR 0x2
+UNONE_API bool PsReadConsoleDataA(const std::string& cmdline, std::string& output, DWORD* exitcode = NULL, DWORD flag = FLAG_STDERR | FLAG_STDOUT, DWORD timeout = INFINITE);
+UNONE_API bool PsReadConsoleDataW(const std::wstring& cmdline, std::string& output, DWORD* exitcode = NULL, DWORD flag = FLAG_STDERR | FLAG_STDOUT, DWORD timeout = INFINITE);
 
 } // namespace UNONE
