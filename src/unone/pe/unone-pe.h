@@ -17,6 +17,8 @@
 
 #include <Windows.h>
 #include <string>
+#include "elf/elf.h"
+#include "elf/elf-parser.h"
 
 namespace UNONE {
 
@@ -76,18 +78,5 @@ UNONE_API CHAR* PeGetDataEntityByDir(__in PIMAGE_DATA_DIRECTORY dir, __in CHAR *
 UNONE_API std::string PeGetPdb(__in CHAR *base, __in UNONE::PE_BASE_TYPE base_type = BASE_IMAGE);
 UNONE_API std::string PeGetPdbByFile(__in std::wstring path);
 UNONE_API PVOID PeGetProcAddress(CHAR *base, CHAR* proc_name, __in UNONE::PE_BASE_TYPE base_type = BASE_IMAGE);
-
-#include "elf/elf.h"
-#define ELF_HEADER32(base) ((Elf32_Ehdr*)base)
-#define ELF_HEADER64(base) ((Elf64_Ehdr*)base)
-#define ELF_PH_HEADER32(base) ((Elf32_Phdr*)((CHAR*)base + ELF_HEADER32(base)->e_phoff))
-#define ELF_PH_HEADER64(base) ((Elf64_Phdr*)((CHAR*)base + ELF_HEADER64(base)->e_phoff))
-#define ELF_SH_HEADER32(base) ((Elf32_Phdr*)((CHAR*)base + ELF_HEADER32(base)->e_shoff))
-#define ELF_SH_HEADER64(base) ((Elf64_Phdr*)((CHAR*)base + ELF_HEADER64(base)->e_shoff))
-#define ELF_X64(base) (ELF_HEADER32(base)->e_ident[4] == ELFCLASS64)
-
-UNONE_API bool ElfX64(__in CHAR* base);
-UNONE_API bool ElfValid(__in CHAR* base);
-UNONE_API DWORD64 ElfGetEntryPoint(__in CHAR* base);
 
 } // namespace UNONE

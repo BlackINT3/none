@@ -15,3 +15,38 @@
 ****************************************************************************/
 #pragma once
 
+#include <Windows.h>
+#include <string>
+#include <internal/unone-internal.h>
+
+namespace UNONE {
+
+#define ELF_HEADER32(base) ((Elf32_Ehdr*)base)
+#define ELF_HEADER64(base) ((Elf64_Ehdr*)base)
+#define ELF_X64(base) (ELF_HEADER32(base)->e_ident[4] == ELFCLASS64)
+#define ELF_PH_HEADER32(base) ((Elf32_Phdr*)((CHAR*)base + ELF_HEADER32(base)->e_phoff))
+#define ELF_PH_HEADER64(base) ((Elf64_Phdr*)((CHAR*)base + ELF_HEADER64(base)->e_phoff))
+#define ELF_SH_HEADER32(base) ((Elf32_Shdr*)((CHAR*)base + ELF_HEADER32(base)->e_shoff))
+#define ELF_SH_HEADER64(base) ((Elf64_Shdr*)((CHAR*)base + ELF_HEADER64(base)->e_shoff))
+#define ELF_SH_STRTAB32(base) ((ELF_SH_HEADER32(base)[ELF_HEADER32(base)->e_shstrndx]).sh_offset)
+#define ELF_SH_STRTAB64(base) ((ELF_SH_HEADER64(base)[ELF_HEADER64(base)->e_shstrndx]).sh_offset)
+
+UNONE_API bool ElfX64(__in CHAR* base);
+UNONE_API bool ElfValid(__in CHAR* base);
+UNONE_API uint64_t ElfGetEntryPoint(__in CHAR* base);
+UNONE_API uint16_t ElfGetPHeaderNums(__in CHAR* base);
+UNONE_API uint16_t ElfGetSectionHeaderNums(__in CHAR* base);
+UNONE_API std::string ElfGetEHeaderTypeString(uint16_t type);
+UNONE_API std::string ElfGetEHeaderMachineString(uint16_t machine);
+UNONE_API std::string ElfGetPHeaderTypeString(uint32_t type);
+UNONE_API std::string ElfGetPHeaderFlagString(uint32_t flags);
+UNONE_API std::string ElfGetSectionName(CHAR* base, uint32_t offset);
+UNONE_API std::string ElfGetSectionTypeString(uint32_t type);
+UNONE_API std::string ElfGetSectionFlagString(uint32_t flags);
+UNONE_API std::string ElfGetDynamicTypeString(uint32_t tag);
+UNONE_API std::string ElfGetDynamicFlagString(uint32_t flag);
+UNONE_API std::string ElfGetSymbolTypeString(unsigned char info);
+UNONE_API std::string ElfGetSymbolBindString(unsigned char info);
+UNONE_API std::string ElfGetSymbolVisibleString(unsigned char other);
+
+} // namespace UNONE
