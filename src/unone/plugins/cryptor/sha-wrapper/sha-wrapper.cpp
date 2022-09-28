@@ -14,6 +14,7 @@
 **
 ****************************************************************************/
 #include "sha1c.h"
+#include "sha256.h"
 #include "sha-wrapper.h"
 #include <unone.h>
 
@@ -53,6 +54,24 @@ void GetSHA1ByData(const char *buf, unsigned int size, char *hash)
 Description:
 	get sha1 hash by buffer data
 Arguments:
+	buf - buffer data
+	size - buffer size
+	hash - hash stream
+Return:
+	void
+--*/
+void GetSHA2ByData(const char* buf, unsigned int size, char* hash)
+{
+	sha256 ctx;
+	sha256_init(&ctx);
+	sha256_update(&ctx, buf, size);
+	sha256_sum(&ctx, (unsigned char*)hash);
+}
+
+/*++
+Description:
+	get sha2 hash by buffer data
+Arguments:
 	buf - buffer string
 Return:
 	hash stream
@@ -67,13 +86,29 @@ std::string GetSHA1ByData(__in const std::string &buf)
 
 /*++
 Description:
+	get sha2 hash by buffer data
+Arguments:
+	buf - buffer string
+Return:
+	hash stream
+--*/
+std::string GetSHA2ByData(__in const std::string& buf)
+{
+	std::string hash;
+	hash.resize(SHA2_HASH_SIZE);
+	GetSHA2ByData(buf.data(), (unsigned int)buf.size(), (char*)hash.data());
+	return hash;
+}
+
+/*++
+Description:
 	get sha1 hash by file path
 Arguments:
 	file - file path
 Return:
 	hash stream
 --*/
-std::string GetSHA1ByFile(__in const std::string &file)
+std::string GetSHA1ByFile(__in const std::string& file)
 {
 	int err;
 	SHA1Context sha;
@@ -82,7 +117,7 @@ std::string GetSHA1ByFile(__in const std::string &file)
 		return "";
 	}
 
-	auto ret = UNONE::FsReadFileBlockA(file, PAGE_SIZE, [&sha,&err](const std::string &blk)->bool {
+	auto ret = UNONE::FsReadFileBlockA(file, PAGE_SIZE, [&sha, &err](const std::string& blk)->bool {
 		err = SHA1Input(&sha, (const unsigned char*)blk.data(), (unsigned int)blk.size());
 		return err == shaSuccess;
 	});
@@ -95,6 +130,32 @@ std::string GetSHA1ByFile(__in const std::string &file)
 	if (err != shaSuccess) {
 		return "";
 	}
+	return hash;
+}
+
+/*++
+Description:
+	get sha2 hash by file path
+Arguments:
+	file - file path
+Return:
+	hash stream
+--*/
+std::string GetSHA2ByFile(__in const std::string& file)
+{
+	sha256 ctx;
+	sha256_init(&ctx);
+
+	auto ret = UNONE::FsReadFileBlockA(file, PAGE_SIZE, [&ctx](const std::string& blk)->bool {
+		sha256_update(&ctx, blk.c_str(), blk.size());
+		return true;
+	});
+	if (!ret) {
+		return  "";
+	}
+	std::string hash;
+	hash.resize(SHA2_HASH_SIZE);
+	sha256_sum(&ctx, (unsigned char*)hash.c_str());
 	return hash;
 }
 

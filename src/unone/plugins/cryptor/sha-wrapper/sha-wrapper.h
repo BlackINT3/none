@@ -21,10 +21,13 @@ namespace Plugins {
 namespace Cryptor {
 	
 #define SHA1_HASH_SIZE 20
+#define SHA2_HASH_SIZE 32
 
 void GetSHA1ByData(__in const char *buf, __in unsigned int size, __out char *hash);
 std::string GetSHA1ByData(__in const std::string &buf);
 std::string GetSHA1ByFile(__in const std::string &file);
+std::string GetSHA2ByData(__in const std::string& buf);
+std::string GetSHA2ByFile(__in const std::string& file);
 
 } // namespace Cryptor
 } // namespace Plugins
