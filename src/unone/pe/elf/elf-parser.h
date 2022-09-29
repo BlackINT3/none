@@ -19,6 +19,10 @@
 #include <string>
 #include <internal/unone-internal.h>
 
+#ifndef NT_ARCH
+#define NT_ARCH 2
+#endif
+
 namespace UNONE {
 
 #define ELF_HEADER32(base) ((Elf32_Ehdr*)base)
@@ -48,5 +52,6 @@ UNONE_API std::string ElfGetDynamicFlagString(uint32_t flag);
 UNONE_API std::string ElfGetSymbolTypeString(unsigned char info);
 UNONE_API std::string ElfGetSymbolBindString(unsigned char info);
 UNONE_API std::string ElfGetSymbolVisibleString(unsigned char other);
+UNONE_API std::string ElfGetSymbolIndexString(unsigned int index);
 
 } // namespace UNONE

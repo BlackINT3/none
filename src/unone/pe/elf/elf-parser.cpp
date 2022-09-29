@@ -444,6 +444,8 @@ std::string ElfGetDynamicTypeString(uint32_t tag)
 		return "VERSYM";
 	case DT_RELACOUNT:
 		return "RELACOUNT";
+	case DT_RELCOUNT:
+		return "RELCOUNT";
 	case DT_FLAGS_1:
 		return "FLAGS_1";
 	case DT_VERDEF:
@@ -542,4 +544,17 @@ std::string ElfGetSymbolVisibleString(unsigned char other)
 	}
 }
 
+std::string ElfGetSymbolIndexString(unsigned int index)
+{
+	char buff[32] = {0};
+	switch (index) {
+	case SHN_UNDEF:	return "UND";
+	case SHN_ABS: return "ABS";
+	case SHN_COMMON: return "COM";
+	default:
+		sprintf(buff, "%d", index);
+		break;
+	}
+	return buff;
+}
 }
