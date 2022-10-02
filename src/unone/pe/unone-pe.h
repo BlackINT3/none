@@ -78,5 +78,6 @@ UNONE_API CHAR* PeGetDataEntityByDir(__in PIMAGE_DATA_DIRECTORY dir, __in CHAR *
 UNONE_API std::string PeGetPdb(__in CHAR *base, __in UNONE::PE_BASE_TYPE base_type = BASE_IMAGE);
 UNONE_API std::string PeGetPdbByFile(__in std::wstring path);
 UNONE_API PVOID PeGetProcAddress(CHAR *base, CHAR* proc_name, __in UNONE::PE_BASE_TYPE base_type = BASE_IMAGE);
+UNONE_API std::string PeGetProcNameByOrdinal(CHAR* base, DWORD ordinal, __in UNONE::PE_BASE_TYPE base_type = BASE_IMAGE);
 
 } // namespace UNONE

@@ -483,6 +483,26 @@ PVOID PeGetProcAddress(CHAR *base, CHAR* proc_name, __in UNONE::PE_BASE_TYPE bas
 	return func_addr;
 }
 
+std::string PeGetProcNameByOrdinal(CHAR* base, DWORD ordinal, __in UNONE::PE_BASE_TYPE base_type)
+{
+	std::string func_name;
+
+	PIMAGE_DATA_DIRECTORY dir = PeGetDataDirectory(IMAGE_DIRECTORY_ENTRY_EXPORT, base, base_type);
+	if (!dir) return func_name;
+
+	PIMAGE_EXPORT_DIRECTORY export_dir = (PIMAGE_EXPORT_DIRECTORY)PeGetDataEntityByDir(dir, base, base_type);
+	if (!export_dir) return func_name;
+
+	PDWORD addr_names = (PDWORD)(RVA_REBASE(export_dir->AddressOfNames) + base);
+	DWORD cnt_ordinals = export_dir->NumberOfFunctions;
+	DWORD base_ordinal = export_dir->Base;
+
+	if (ordinal < base_ordinal || ordinal >= (base_ordinal + cnt_ordinals))
+		return func_name;
+	func_name = RVA_REBASE(addr_names[ordinal - base_ordinal]) + base;
+	return func_name;
+}
+
 PIMAGE_THUNK_DATA PeGetImportThunkData(CHAR* base, CHAR* dll_name, CHAR* func_name, __in UNONE::PE_BASE_TYPE base_type)
 {
 	if (!base || !dll_name || !func_name)
