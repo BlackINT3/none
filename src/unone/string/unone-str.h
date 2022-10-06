@@ -29,6 +29,14 @@ const std::string kDecDigits = "0123456789";
 const std::string kOctDigits = "01234567";
 const std::string kBinDigits = "01";
 
+#ifndef HEX_TO_UPPER_CHAR
+#define HEX_TO_UPPER_CHAR(x)	((unsigned char)(x) > 9 ? (unsigned char)(x) -10 + 'A': (unsigned char)(x) + '0')
+#endif
+//'1' => 1 / 'A' => A
+#ifndef UPPER_CHAR_TO_HEX
+#define UPPER_CHAR_TO_HEX(x)	(isdigit((unsigned char)(x)) ? (unsigned char)(x)-'0' : (unsigned char)(toupper(x))-'A'+10)
+#endif
+
 /*
 // NAME-CONVENTION-SPEC
 //

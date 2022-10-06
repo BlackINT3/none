@@ -49,9 +49,10 @@ UNONE_API std::string ElfGetSectionTypeString(uint32_t type);
 UNONE_API std::string ElfGetSectionFlagString(uint32_t flags);
 UNONE_API std::string ElfGetDynamicTypeString(uint32_t tag);
 UNONE_API std::string ElfGetDynamicFlagString(uint32_t flag);
-UNONE_API std::string ElfGetSymbolTypeString(unsigned char info);
-UNONE_API std::string ElfGetSymbolBindString(unsigned char info);
-UNONE_API std::string ElfGetSymbolVisibleString(unsigned char other);
-UNONE_API std::string ElfGetSymbolIndexString(unsigned int index);
+UNONE_API std::string ElfGetSymbolTypeString(uint8_t info);
+UNONE_API std::string ElfGetSymbolBindString(uint8_t info);
+UNONE_API std::string ElfGetSymbolVisibleString(uint8_t other);
+UNONE_API std::string ElfGetSymbolIndexString(uint32_t index);
+UNONE_API std::string ElfGetRelocationTypeString(uint32_t type, uint16_t machine);
 
 } // namespace UNONE

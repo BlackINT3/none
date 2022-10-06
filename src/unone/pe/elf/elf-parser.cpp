@@ -14,6 +14,8 @@
 **
 ****************************************************************************/
 #include <string>
+#include <internal/unone-internal.h>
+#include <string/unone-str.h>
 #include "elf-parser.h"
 #include "elf.h"
 namespace UNONE {
@@ -106,7 +108,7 @@ std::string ElfGetEHeaderMachineString(uint16_t machine)
 	case EM_SPARC:
 		return "Sun Microsystems SPARC";
 	case EM_386:
-		return "Intel 80386";
+		return "X86";
 	case EM_68K:
 		return "Motorola 68000";
 	case EM_88K:
@@ -136,7 +138,7 @@ std::string ElfGetEHeaderMachineString(uint16_t machine)
 	case EM_IA_64:
 		return "Intel Itanium";
 	case EM_X86_64:
-		return "AMD x86-64";
+		return "X64";
 	case EM_VAX:
 		return "DEC Vax";
 	default:
@@ -472,7 +474,7 @@ std::string ElfGetDynamicFlagString(uint32_t flag)
 	return str;
 }
 
-std::string ElfGetSymbolTypeString(unsigned char info)
+std::string ElfGetSymbolTypeString(uint8_t info)
 {
 	switch (ELF64_ST_TYPE(info)) {
 	case STT_NOTYPE:
@@ -504,7 +506,7 @@ std::string ElfGetSymbolTypeString(unsigned char info)
 	}
 }
 
-std::string ElfGetSymbolBindString(unsigned char info)
+std::string ElfGetSymbolBindString(uint8_t info)
 {
 	switch (ELF64_ST_BIND(info)) {
 	case STB_LOCAL:
@@ -528,7 +530,7 @@ std::string ElfGetSymbolBindString(unsigned char info)
 	}
 }
 
-std::string ElfGetSymbolVisibleString(unsigned char other)
+std::string ElfGetSymbolVisibleString(uint8_t other)
 {
 	switch (ELF64_ST_VISIBILITY(other)) {
 	case STV_DEFAULT:
@@ -544,7 +546,7 @@ std::string ElfGetSymbolVisibleString(unsigned char other)
 	}
 }
 
-std::string ElfGetSymbolIndexString(unsigned int index)
+std::string ElfGetSymbolIndexString(uint32_t index)
 {
 	char buff[32] = {0};
 	switch (index) {
@@ -556,5 +558,68 @@ std::string ElfGetSymbolIndexString(unsigned int index)
 		break;
 	}
 	return buff;
+}
+
+std::string ElfGetRelocationTypeString(uint32_t type, uint16_t machine)
+{
+	if (machine == EM_X86_64) {
+		switch (type) {
+		case R_X86_64_64:
+			return "R_X86_64_64";
+		case R_X86_64_PC32:
+			return "R_X86_64_PC32";
+		case R_X86_64_GOT32:
+			return "R_X86_64_GOT32";
+		case R_X86_64_PLT32:
+			return "R_X86_64_PLT32";
+		case R_X86_64_RELATIVE:
+			return "R_X86_64_RELATIVE";
+		case R_X86_64_JUMP_SLOT:
+			return "R_X86_64_JUMP_SLOT";
+		}
+	} else if (machine == EM_386) {
+		switch (type) {
+		case R_386_GOT32:
+			return "R_386_GOT32";
+		case R_386_PLT32:
+			return "R_386_PLT32";
+		case R_386_JMP_SLOT:
+			return "R_386_JMP_SLOT";
+		case R_386_RELATIVE:
+			return "R_386_RELATIVE";
+		case R_386_PC32:
+			return "R_386_PC32";
+		case R_386_32:
+			return "R_386_32";
+		}
+	} else if (machine == EM_ARM) {
+		switch (type) {
+		case R_ARM_ABS32:
+			return "R_ARM_ABS32";
+		case R_ARM_GLOB_DAT:
+			return "R_ARM_GLOB_DAT";
+		case R_ARM_RELATIVE:
+			return "R_ARM_RELATIVE";
+		case R_ARM_JUMP_SLOT:
+			return "R_ARM_JUMP_SLOT";
+		}
+
+	} else if (machine == EM_AARCH64) {
+		switch (type) {
+		case R_AARCH64_ABS16:
+			return "R_AARCH64_ABS64";
+		case R_AARCH64_ABS32:
+			return "R_AARCH64_ABS32";
+		case R_AARCH64_ABS64:
+			return "R_AARCH64_ABS64";
+		case R_AARCH64_GLOB_DAT:
+			return "R_AARCH64_GLOB_DAT";
+		case R_AARCH64_JUMP_SLOT:
+			return "R_AARCH64_JUMP_SLOT";
+		case R_AARCH64_RELATIVE:
+			return "R_AARCH64_RELATIVE";
+		}
+	}
+	return UNONE::StrFormatA("%08X", type);
 }
 }
