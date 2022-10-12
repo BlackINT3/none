@@ -1842,7 +1842,9 @@ bool PsReadConsoleDataW(const std::wstring& cmdline, std::string& output, DWORD*
 		CloseHandle(rstdin);
 		return false;
 	}
-	GetExitCodeProcess(pi.hProcess, exitcode);
+	DWORD tempcode;
+	GetExitCodeProcess(pi.hProcess, &tempcode);
+	if (exitcode) *exitcode = tempcode;
 
 	CloseHandle(pi.hThread);
 	CloseHandle(pi.hProcess);

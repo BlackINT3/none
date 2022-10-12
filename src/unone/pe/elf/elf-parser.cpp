@@ -84,6 +84,70 @@ uint16_t ElfGetSectionHeaderNums(__in CHAR* base)
 		return ELF_HEADER32(base)->e_shnum;
 }
 
+std::string ElfGetIdentClassString(uint8_t clazz)
+{
+	char buff[32];
+	switch (clazz) {
+	case ELFCLASSNONE: return "None";
+	case ELFCLASS32:   return "ELF32";
+	case ELFCLASS64:   return "ELF64";
+	default:
+		snprintf(buff, sizeof(buff), "Unknown: %x", clazz);
+		return buff;
+	}
+}
+
+std::string ElfGetIdentEncoding(uint8_t code)
+{
+	char buff[32];
+	switch (code) {
+	case ELFDATANONE: return "None";
+	case ELFDATA2LSB: return "Little Endian";
+	case ELFDATA2MSB: return "Big Endian";
+	default:
+		snprintf(buff, sizeof(buff), "Unknown: %x", code);
+		return buff;
+	}
+}
+
+std::string ElfGetIdentVersionString(uint8_t version)
+{
+	switch (version) {
+	case EV_CURRENT:
+		return "Current";
+	default:
+		return "Invalid";
+	}
+}
+
+std::string ElfGetIdentOSABIString(uint8_t osabi)
+{
+	switch (osabi) {
+	case ELFOSABI_SYSV:
+		return "UNIX System V ABI";
+	case ELFOSABI_HPUX:
+		return "HP-UX ABI";
+	case ELFOSABI_NETBSD:
+		return "NETBSD ABI";
+	case ELFOSABI_LINUX:
+		return "Linux ABI";
+	case ELFOSABI_SOLARIS:
+		return "Solaris ABI";
+	case ELFOSABI_IRIX:
+		return "IRIX ABI";
+	case ELFOSABI_FREEBSD:
+		return "FreeBSD ABI";
+	case ELFOSABI_TRU64:
+		return "TRU64 UNIX ABI";
+	case ELFOSABI_ARM:
+		return "ARM architecture ABI";
+	case ELFOSABI_STANDALONE:
+		return "Stand-alone (embedded) ABI";
+	default:
+		return "Unknown";
+	}
+}
+
 std::string ElfGetEHeaderTypeString(uint16_t type)
 {
 	switch (type) {
@@ -108,7 +172,7 @@ std::string ElfGetEHeaderMachineString(uint16_t machine)
 	case EM_SPARC:
 		return "Sun Microsystems SPARC";
 	case EM_386:
-		return "X86";
+		return "x86";
 	case EM_68K:
 		return "Motorola 68000";
 	case EM_88K:
@@ -138,7 +202,7 @@ std::string ElfGetEHeaderMachineString(uint16_t machine)
 	case EM_IA_64:
 		return "Intel Itanium";
 	case EM_X86_64:
-		return "X64";
+		return "x86_64";
 	case EM_VAX:
 		return "DEC Vax";
 	default:
