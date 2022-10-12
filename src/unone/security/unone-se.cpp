@@ -15,7 +15,8 @@
 ****************************************************************************/
 #include <Windows.h>
 #include <wintrust.h>
-#include <Softpub.h>
+#include <softpub.h>
+#include <mscat.h>
 #pragma comment(lib, "Crypt32.lib")
 #include <algorithm>
 #include <tchar.h>
@@ -24,7 +25,23 @@
 #include <internal/unone-internal.h>
 #include <string/unone-str.h>
 #include <os/unone-os.h>
+#include <time/unone-tm.h>
 #include "unone-se.h"
+
+#ifndef WINTRUST_SIGNATURE_SETTINGS
+typedef struct WINTRUST_SIGNATURE_SETTINGS_ {
+	DWORD                  cbStruct;
+	DWORD                  dwIndex;
+	DWORD                  dwFlags;
+	DWORD                  cSecondarySigs;
+	DWORD                  dwVerifiedSigIndex;
+	PVOID				 pCryptoPolicy;
+} WINTRUST_SIGNATURE_SETTINGS, * PWINTRUST_SIGNATURE_SETTINGS;
+//Verifies the signature specified in WINTRUST_SIGNATURE_SETTINGS.dwIndex
+#define WSS_VERIFY_SPECIFIC         0x00000001  
+//Puts count of secondary signatures in WINTRUST_SIGNATURE_SETTINGS.cSecondarySigs
+#define WSS_GET_SECONDARY_SIG_COUNT 0x00000002
+#endif
 
 namespace {
 enum PRIVILEGE_OPERATE {
@@ -117,6 +134,68 @@ bool OpProcessPrivilegeByNative(DWORD priv_number, PRIVILEGE_OPERATE operate_typ
 	return result;
 }
 
+bool GetCertInfo(HANDLE state_data, std::vector<UNONE::CertInfoW>& infos)
+{
+	HMODULE wintrust = GetModuleHandleW(L"wintrust.dll");
+	if (wintrust == NULL) {
+		wintrust = LoadLibraryW(L"wintrust.dll");
+		if (wintrust == NULL) return false;
+	}
+	typedef CRYPT_PROVIDER_DATA* (WINAPI* __WTHelperProvDataFromStateData)(HANDLE hStateData);
+	typedef DWORD (WINAPI* __CertGetNameStringA)(PCCERT_CONTEXT pCertContext, DWORD dwType, DWORD dwFlags, void* pvTypePara, LPWSTR pszNameString, DWORD cchNameString);
+	typedef PCCRYPT_OID_INFO (WINAPI* __CryptFindOIDInfo)(DWORD dwKeyType, void* pvKey, DWORD dwGroupId);
+	auto pWTHelperProvDataFromStateData = (__WTHelperProvDataFromStateData)GetProcAddress(wintrust, "WTHelperProvDataFromStateData");
+	if (!pWTHelperProvDataFromStateData) {
+		return false;
+	}
+
+	do {
+		HMODULE crypt32 = GetModuleHandleW(L"crypt32.dll");
+		if (!crypt32) {
+			crypt32 = LoadLibraryW(L"crypt32.dll");
+			if (crypt32 == NULL) break;
+		}
+		auto pCertGetNameStringW = (__CertGetNameStringA)GetProcAddress(crypt32, "CertGetNameStringW");
+		auto pCryptFindOIDInfo = (__CryptFindOIDInfo)GetProcAddress(crypt32, "CryptFindOIDInfo");
+		if (!pCertGetNameStringW || !pCryptFindOIDInfo)
+			break;
+
+		PCRYPT_PROVIDER_DATA ProviderData = pWTHelperProvDataFromStateData(state_data);
+		if (ProviderData == NULL || ProviderData->pasSigners == NULL || ProviderData->pasSigners->psSigner == NULL)
+			break;
+
+		for (auto signer = ProviderData->pasSigners; signer != NULL; signer = signer->pasCounterSigners) {
+			UNONE::CertInfoW info;
+			PCRYPT_INTEGER_BLOB serial = &signer->psSigner->SerialNumber;
+			PCRYPT_ALGORITHM_IDENTIFIER hashalg = &signer->psSigner->HashAlgorithm;
+			if (hashalg && hashalg->pszObjId) {
+				PCCRYPT_OID_INFO coi = pCryptFindOIDInfo(CRYPT_OID_INFO_OID_KEY, hashalg->pszObjId, 0);
+				if (coi && coi->pwszName) {
+					info.hashalg = UNONE::StrFormatW(L"%ls", coi->pwszName);
+				} else {
+					info.hashalg = UNONE::StrFormatW(L"%hs", hashalg->pszObjId);
+				}
+			}
+			info.sn = UNONE::StrToW(UNONE::StrStreamToHexStrA(std::string((char*)serial->pbData, serial->cbData)));
+			info.date = UNONE::TmFormatSystemTimeW(UNONE::TmConvertZoneTime(UNONE::TmFileTimeToSystem(signer->sftVerifyAsOf), NULL), L"Y-M-D H:W:S");
+			PCERT_SIMPLE_CHAIN chain = signer->pChainContext->rgpChain[0];
+			PCCERT_CONTEXT ctx = chain->rgpElement[0]->pCertContext;
+			DWORD size = pCertGetNameStringW(ctx, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, NULL, 0);
+			auto owner = new(std::nothrow) WCHAR[size];
+			if (owner) {
+				pCertGetNameStringW(ctx, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, owner, size);
+				info.owner = std::move(owner);
+				delete[] owner;
+			}
+			infos.push_back(info);
+			break;
+		}
+	} while (0);
+	return true;
+}
+
+//refrence:
+//https://github.com/microsoft/Windows-classic-samples/blob/main/Samples/Security/CodeSigning/cpp/codesigning.cpp
 bool OpSignatureInfoW(const std::wstring &file, std::vector<UNONE::CertInfoW> &infos, bool revoked_check, bool only_verify)
 {
 	#define HCATADMIN	HANDLE	
@@ -132,8 +211,6 @@ bool OpSignatureInfoW(const std::wstring &file, std::vector<UNONE::CertInfoW> &i
 	typedef BOOL(WINAPI* __CryptCATAdminReleaseCatalogContext)(HCATADMIN catadmin, HCATINFO CatInfo, DWORD dwFlags);
 	typedef BOOL(WINAPI* __CryptCATCatalogInfoFromContext)(HCATINFO CatInfo, CATALOG_INFO* psCatInfo, DWORD dwFlags);
 	typedef LONG(WINAPI* __WinVerifyTrust)(HWND hWnd, GUID* pgActionID, WINTRUST_DATA* pWinTrustData);
-	typedef CRYPT_PROVIDER_DATA* (WINAPI* __WTHelperProvDataFromStateData)(HANDLE hStateData);
-	typedef DWORD(WINAPI *__CertGetNameStringA)(PCCERT_CONTEXT pCertContext, DWORD dwType, DWORD dwFlags, void *pvTypePara, LPWSTR pszNameString, DWORD cchNameString);
 	
 	bool ret = false;
 	HMODULE wintrust = GetModuleHandleW(L"wintrust.dll");
@@ -148,10 +225,9 @@ bool OpSignatureInfoW(const std::wstring &file, std::vector<UNONE::CertInfoW> &i
 	auto pCryptCATAdminReleaseCatalogContext = (__CryptCATAdminReleaseCatalogContext)GetProcAddress(wintrust, "CryptCATAdminReleaseCatalogContext");
 	auto pCryptCATCatalogInfoFromContext = (__CryptCATCatalogInfoFromContext)GetProcAddress(wintrust, "CryptCATCatalogInfoFromContext");
 	auto pWinVerifyTrust = (__WinVerifyTrust)GetProcAddress(wintrust, "WinVerifyTrust");
-	auto pWTHelperProvDataFromStateData = (__WTHelperProvDataFromStateData)GetProcAddress(wintrust, "WTHelperProvDataFromStateData");
 	if (!pCryptCATAdminAcquireContext || !pCryptCATAdminReleaseContext || !pCryptCATAdminCalcHashFromFileHandle ||
 		!pCryptCATAdminEnumCatalogFromHash || !pCryptCATAdminReleaseCatalogContext || !pCryptCATCatalogInfoFromContext ||
-		!pWinVerifyTrust || !pWTHelperProvDataFromStateData) {
+		!pWinVerifyTrust) {
 		return false;
 	}
 
@@ -168,12 +244,20 @@ bool OpSignatureInfoW(const std::wstring &file, std::vector<UNONE::CertInfoW> &i
 
 	HRESULT hr;
 	DWORD err = ERROR_SUCCESS;
-	WINTRUST_DATA wd = { 0 };
+	WINTRUST_DATA *wd = new WINTRUST_DATA;
 	HCATINFO catalog = NULL;
 	GUID action = WINTRUST_ACTION_GENERIC_VERIFY_V2;
+
+	int wdsize = sizeof(WINTRUST_DATA);
+#if _WIN32_WINNT <= 0x0601
+	//WINTRUST_SIGNATURE_SETTINGS introduced in Win8
+	if (UNONE::OsMajorVer() >= 6 && UNONE::OsMinorVer() >= 2 || UNONE::OsMajorVer()>=10) {
+		wdsize = sizeof(WINTRUST_DATA) + sizeof(WINTRUST_SIGNATURE_SETTINGS*);
+	}
+#endif
 	do {
-		DWORD hsize = 64;
 		BYTE hash[64];
+		DWORD hsize = 64;
 		pCryptCATAdminCalcHashFromFileHandle(fd, &hsize, hash, 0);
 		CloseHandle(fd);
 
@@ -186,15 +270,15 @@ bool OpSignatureInfoW(const std::wstring &file, std::vector<UNONE::CertInfoW> &i
 			wfi.pcwszFilePath = file.c_str();
 			wfi.hFile = NULL;
 			wfi.pgKnownSubject = NULL;
-			wd.cbStruct = sizeof(WINTRUST_DATA);
-			wd.dwUnionChoice = WTD_CHOICE_FILE;
-			wd.pFile = &wfi;
-			wd.dwUIChoice = WTD_UI_NONE;
-			wd.hWVTStateData = NULL;
-			wd.pwszURLReference = NULL;
-			wd.dwStateAction = WTD_STATEACTION_VERIFY;
-			wd.fdwRevocationChecks = WTD_REVOKE_NONE;
-			wd.dwProvFlags = revoked_check ? WTD_SAFER_FLAG : WTD_CACHE_ONLY_URL_RETRIEVAL;
+			wd->cbStruct = wdsize;
+			wd->dwUnionChoice = WTD_CHOICE_FILE;
+			wd->pFile = &wfi;
+			wd->dwUIChoice = WTD_UI_NONE;
+			wd->hWVTStateData = NULL;
+			wd->pwszURLReference = NULL;
+			wd->dwStateAction = WTD_STATEACTION_VERIFY;
+			wd->fdwRevocationChecks = WTD_REVOKE_NONE;
+			wd->dwProvFlags = revoked_check ? WTD_SAFER_FLAG : WTD_CACHE_ONLY_URL_RETRIEVAL;
 		}	else {
 			auto member_tag = UNONE::StrToW(UNONE::StrStreamToHexStrA(std::string((char*)hash, hsize)));
 			pCryptCATCatalogInfoFromContext(catalog, &ci, 0);
@@ -204,66 +288,56 @@ bool OpSignatureInfoW(const std::wstring &file, std::vector<UNONE::CertInfoW> &i
 			wci.pcwszMemberTag = member_tag.c_str();
 			wci.pbCalculatedFileHash = hash;
 			wci.cbCalculatedFileHash = hsize;
-			wd.cbStruct = sizeof(WINTRUST_DATA);
-			wd.dwUnionChoice = WTD_CHOICE_CATALOG;
-			wd.pCatalog = &wci;
-			wd.dwUIChoice = WTD_UI_NONE;
-			wd.hWVTStateData = NULL;
-			wd.pwszURLReference = NULL;
-			wd.dwStateAction = WTD_STATEACTION_VERIFY;
-			wd.fdwRevocationChecks = revoked_check ? WTD_REVOKE_WHOLECHAIN : WTD_REVOKE_NONE;
-			wd.dwProvFlags = revoked_check ? 0 : WTD_CACHE_ONLY_URL_RETRIEVAL;
+			wd->cbStruct = wdsize;
+			wd->dwUnionChoice = WTD_CHOICE_CATALOG;
+			wd->pCatalog = &wci;
+			wd->dwUIChoice = WTD_UI_NONE;
+			wd->hWVTStateData = NULL;
+			wd->pwszURLReference = NULL;
+			wd->dwStateAction = WTD_STATEACTION_VERIFY;
+			wd->fdwRevocationChecks = revoked_check ? WTD_REVOKE_WHOLECHAIN : WTD_REVOKE_NONE;
+			wd->dwProvFlags = revoked_check ? 0 : WTD_CACHE_ONLY_URL_RETRIEVAL;
 		}
 
-//	[TODO] support double signatures
-//	WINTRUST_SIGNATURE_SETTINGS ss = {0};
-//	ss.cbStruct = sizeof(WINTRUST_SIGNATURE_SETTINGS);
-//	ss.dwFlags = WSS_GET_SECONDARY_SIG_COUNT | WSS_VERIFY_SPECIFIC;
-//	ss.dwIndex = 0;
-//	wd.pSignatureSettings = &ss;
+		// multi signatures
+		WINTRUST_SIGNATURE_SETTINGS wss = {0};
+		wss.cbStruct = sizeof(WINTRUST_SIGNATURE_SETTINGS);
+		wss.dwFlags = WSS_GET_SECONDARY_SIG_COUNT | WSS_VERIFY_SPECIFIC;
+		wss.dwIndex = 0;
 
-		hr = pWinVerifyTrust(NULL, &action, &wd);
+		WINTRUST_SIGNATURE_SETTINGS* pSignatureSettings;
+#if _WIN32_WINNT <= 0x0601
+		pSignatureSettings = *(WINTRUST_SIGNATURE_SETTINGS**)((char*)&wd->dwUIContext + sizeof(DWORD)) = &wss;
+#else
+		pSignatureSettings = wd->pSignatureSettings = &wss;
+#endif
+
+		hr = pWinVerifyTrust(NULL, &action, wd);
 		ret = SUCCEEDED(hr);
 		if (!ret) err = hr;
 		if (only_verify) break;
-
-		HMODULE crypt32 = GetModuleHandleW(L"crypt32.dll");
-		if (crypt32 == NULL) {
-			crypt32 = LoadLibraryW(L"crypt32.dll");
-			if (crypt32 == NULL) break;
-		}
-		auto pCertGetNameStringW = (__CertGetNameStringA)GetProcAddress(crypt32, "CertGetNameStringW");
-		if (!pCertGetNameStringW)
-			break;
-
-		PCRYPT_PROVIDER_DATA ProviderData = pWTHelperProvDataFromStateData(wd.hWVTStateData);
-		if (ProviderData == NULL || ProviderData->pasSigners == NULL || ProviderData->pasSigners->psSigner == NULL)
-			break;
 		
-		auto signer = ProviderData->pasSigners;
-		for (; signer != NULL; signer = signer->pasCounterSigners) {
-			UNONE::CertInfoW info;
-			CRYPT_INTEGER_BLOB serial;
-			serial = signer->psSigner->SerialNumber;
-			info.sn = UNONE::StrToW(UNONE::StrStreamToHexStrA(std::string((char*)serial.pbData, serial.cbData)));
+		std::vector<UNONE::CertInfoW> temps;
+		GetCertInfo(wd->hWVTStateData, temps);
+		infos.insert(infos.end(), temps.begin(), temps.end());
 
-			PCERT_SIMPLE_CHAIN chain = signer->pChainContext->rgpChain[0];
-			PCCERT_CONTEXT ctx = chain->rgpElement[0]->pCertContext;
-			DWORD size = pCertGetNameStringW(ctx, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, NULL, 0);
-			auto owner = new(std::nothrow) WCHAR[size];
-			if (owner) {
-				pCertGetNameStringW(ctx, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, owner, size);
-				info.owner = std::move(owner);
-				delete[] owner;
-			}
-			infos.push_back(info);
-			break;
+		// Now attempt to verify all secondary signatures that were found
+		for (DWORD i = 1; i <= pSignatureSettings->cSecondarySigs; i++) {
+			temps.clear();
+			wss.dwIndex = i;
+			wd->hWVTStateData = NULL;
+			hr = pWinVerifyTrust(NULL, &action, wd);
+			ret = SUCCEEDED(hr);
+			if (!ret) err = hr;
+			GetCertInfo(wd->hWVTStateData, temps);
+			infos.insert(infos.end(), temps.begin(), temps.end());
 		}
+
 	} while (0);
 
-	//Free wd.hWVTStateData
-	wd.dwStateAction = WTD_STATEACTION_CLOSE;
-	hr = pWinVerifyTrust(NULL, &action, &wd);
+	//Free wd->hWVTStateData
+	wd->dwStateAction = WTD_STATEACTION_CLOSE;
+	hr = pWinVerifyTrust(NULL, &action, wd);
 	if (catalog != NULL) pCryptCATAdminReleaseCatalogContext(catadmin, catalog, 0);
 	pCryptCATAdminReleaseContext(catadmin, 0);
 

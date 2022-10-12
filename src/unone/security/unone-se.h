@@ -37,10 +37,14 @@ namespace UNONE {
 struct CertInfoA {
 	std::string sn;
 	std::string owner;
+	std::string date;
+	std::string hashalg;
 };
 struct CertInfoW {
 	std::wstring sn;
 	std::wstring owner;
+	std::wstring date;
+	std::wstring hashalg;
 };
 UNONE_API bool SeEnablePrivilegeA(__in const char* priv_name, __in DWORD priv_number = 0);
 UNONE_API bool SeEnablePrivilegeW(__in const wchar_t* priv_name, __in DWORD priv_number = 0);
