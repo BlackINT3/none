@@ -13,3 +13,29 @@
 ** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 **
 ****************************************************************************/
+#include "knone-mm.h"
+#include <internal/knone-assist.h>
+
+namespace KNONE {
+
+VOID MmEnableWP()
+{
+	return __MmEnableWP();
+}
+
+VOID MmDisableWP()
+{
+	return __MmDisableWP();
+}
+
+VOID MmWriteProtectOn(IN KIRQL Irql)
+{
+	return __MmWriteProtectOn(Irql);
+}
+
+KIRQL MmWriteProtectOff()
+{
+	return __MmWriteProtectOff();
+}
+
+} // namespace KNONE

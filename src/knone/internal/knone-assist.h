@@ -14,13 +14,11 @@
 **
 ****************************************************************************/
 #pragma once
-#include <common/knone-common.h>
-#include <internal/knone-internal.h>
-namespace KNONE {
+#include <ntifs.h>
 
-KNONE_API VOID MmEnableWP();
-KNONE_API VOID MmDisableWP();
-KNONE_API VOID MmWriteProtectOn(IN KIRQL Irql);
-KNONE_API KIRQL MmWriteProtectOff();
-
-} // namespace KNONE
+extern "C" {
+VOID __MmEnableWP();
+VOID __MmDisableWP();
+VOID __MmWriteProtectOn(IN KIRQL Irql);
+KIRQL __MmWriteProtectOff();
+}

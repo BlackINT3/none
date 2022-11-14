@@ -13,14 +13,45 @@
 ** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 **
 ****************************************************************************/
-#pragma once
-#include <common/knone-common.h>
-#include <internal/knone-internal.h>
-namespace KNONE {
+#include <ntifs.h>
 
-KNONE_API VOID MmEnableWP();
-KNONE_API VOID MmDisableWP();
-KNONE_API VOID MmWriteProtectOn(IN KIRQL Irql);
-KNONE_API KIRQL MmWriteProtectOff();
+VOID __MmEnableWP()
+{
+	SIZE_T cr0 = (SIZE_T)__readcr0();
+	cr0 |= 0x10000;
+	__writecr0(cr0);
+}
 
-} // namespace KNONE
+VOID __MmDisableWP()
+{
+	SIZE_T cr0 = (SIZE_T)__readcr0();
+	cr0 &= ~((SIZE_T)1 << 16);
+	__writecr0(cr0);
+}
+
+VOID __MmWriteProtectOn(IN KIRQL Irql)
+{
+	SIZE_T cr0 = (SIZE_T)__readcr0();
+	cr0 |= 0x10000;
+#ifdef _AMD64_
+	_enable();
+#else
+	__asm cli
+#endif
+	__writecr0(cr0);
+	KeLowerIrql(Irql);
+}
+
+KIRQL __MmWriteProtectOff()
+{
+	KIRQL irql = KeRaiseIrqlToDpcLevel();
+	SIZE_T cr0 = (SIZE_T)__readcr0();
+	cr0 &= ~((SIZE_T)1 << 16);
+	__writecr0(cr0);
+#ifdef _AMD64_
+	_disable();
+#else
+	__asm sti
+#endif
+	return irql;
+}
