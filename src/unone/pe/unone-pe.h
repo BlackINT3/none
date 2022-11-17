@@ -75,6 +75,8 @@ UNONE_API DWORD PeGetEntryPoint(__in CHAR *base);
 UNONE_API PIMAGE_DATA_DIRECTORY PeGetDataDirectory(__in DWORD idx, __in CHAR *base, __in UNONE::PE_BASE_TYPE base_type = BASE_IMAGE);
 UNONE_API CHAR* PeGetDataEntity(__in DWORD idx, __in CHAR *base, __in UNONE::PE_BASE_TYPE base_type = BASE_IMAGE);
 UNONE_API CHAR* PeGetDataEntityByDir(__in PIMAGE_DATA_DIRECTORY dir, __in CHAR *base, __in UNONE::PE_BASE_TYPE base_type = BASE_IMAGE);
+UNONE_API std::string PeGetSymid(__in CHAR* base, __in UNONE::PE_BASE_TYPE base_type = BASE_IMAGE);
+UNONE_API std::string PeGetSymidByFile(__in std::wstring path);
 UNONE_API std::string PeGetPdb(__in CHAR *base, __in UNONE::PE_BASE_TYPE base_type = BASE_IMAGE);
 UNONE_API std::string PeGetPdbByFile(__in std::wstring path);
 UNONE_API PVOID PeGetProcAddress(CHAR *base, CHAR* proc_name, __in UNONE::PE_BASE_TYPE base_type = BASE_IMAGE);

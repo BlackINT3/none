@@ -1219,4 +1219,29 @@ bool FsDeleteDirectoryW(__in const std::wstring& dir)
 	return ret;
 }
 
+/*++
+Description:
+	delete file
+Arguments:
+	file - file path
+Return:
+	bool
+--*/
+bool FsDeleteFileA(__in const std::string& file)
+{
+	return !!DeleteFileA(file.c_str());
+}
+
+/*++
+Description:
+	delete file
+Arguments:
+	file - file path
+Return:
+	bool
+--*/
+bool FsDeleteFileW(__in const std::wstring& file)
+{
+	return !!DeleteFileW(file.c_str());
+}
 } // namespace UNONE

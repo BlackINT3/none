@@ -121,4 +121,6 @@ UNONE_API bool FsCopyDirectoryA(const std::string &src, const std::string &dst);
 UNONE_API bool FsCopyDirectoryW(const std::wstring &src, const std::wstring &dst);
 UNONE_API bool FsDeleteDirectoryA(__in const std::string& dir);
 UNONE_API bool FsDeleteDirectoryW(__in const std::wstring& dir);
+UNONE_API bool FsDeleteFileA(__in const std::string& file);
+UNONE_API bool FsDeleteFileW(__in const std::wstring& file);
 } // namespace UNONE

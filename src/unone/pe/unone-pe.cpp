@@ -361,12 +361,74 @@ CHAR* PeGetDataEntityByDir(__in PIMAGE_DATA_DIRECTORY dir, __in CHAR *base, __in
 
 /*++
 Description:
+	get symbol id
+Arguments:
+	base - image/file base
+	base_type = implies image or file
+Return:
+	symid
+--*/
+std::string PeGetSymid(__in CHAR* base, __in UNONE::PE_BASE_TYPE base_type)
+{
+	PIMAGE_DEBUG_DIRECTORY dbg = (PIMAGE_DEBUG_DIRECTORY)UNONE::PeGetDataEntity(IMAGE_DIRECTORY_ENTRY_DEBUG, base, base_type);
+	if (dbg == NULL || dbg->Type != IMAGE_DEBUG_TYPE_CODEVIEW ||
+		!dbg->AddressOfRawData || !dbg->SizeOfData) {
+		return "";
+	}
+	DWORD offset = dbg->AddressOfRawData;
+	if (base_type == BASE_FILE) offset = PeRvaToRaw(base, offset);
+	CV_HEADER* cv_hdr = (CV_HEADER*)(base + offset);
+	DWORD cv_size = dbg->SizeOfData;
+	if (!UNONE::PeRegionValid(base, cv_hdr, cv_size))
+		return "";
+
+	DWORD age = 0;
+	std::string symid;
+	if (cv_hdr->Signature == RSDS_SIG) {
+		GUID guid = ((UNONE::CV_INFO_PDB70*)cv_hdr)->Signature;
+		age = ((UNONE::CV_INFO_PDB70*)cv_hdr)->Age;
+		symid = UNONE::StrFormatA("%08X%04X%04X%02X%02X%02X%02X%02X%02X%02X%02X%X",
+			guid.Data1, guid.Data2, guid.Data3,
+			guid.Data4[0],
+			guid.Data4[1],
+			guid.Data4[2],
+			guid.Data4[3],
+			guid.Data4[4],
+			guid.Data4[5],
+			guid.Data4[6],
+			guid.Data4[7],
+			age);
+	}
+	return symid;
+}
+
+/*++
+Description:
+	get symbol id
+Arguments:
+	path - file path
+Return:
+	symid
+--*/
+std::string PeGetSymidByFile(__in std::wstring path)
+{
+	DWORD file_size = 0;
+	HANDLE fd, hmap;
+	CHAR* file_buf = MmMapFileW(path, file_size, fd, hmap);
+	if (!file_buf) return NULL;
+	std::string pdb_file = PeGetSymid(file_buf, UNONE::BASE_FILE);
+	MmUnmapFile(file_buf, fd, hmap);
+	return pdb_file;
+}
+
+/*++
+Description:
 	get pdb file
 Arguments:
 	base - image/file base
 	base_type = implies image or file
 Return:
-	entity
+	pdb
 --*/
 std::string PeGetPdb(__in CHAR *base, __in UNONE::PE_BASE_TYPE base_type /*= BASE_IMAGE*/)
 {
@@ -405,10 +467,9 @@ std::string PeGetPdb(__in CHAR *base, __in UNONE::PE_BASE_TYPE base_type /*= BAS
 Description:
 	get pdb file
 Arguments:
-	base - image/file base
-	base_type = implies image or file
+	path - file path
 Return:
-	entity
+	pdb
 --*/
 std::string PeGetPdbByFile(__in std::wstring path)
 {
