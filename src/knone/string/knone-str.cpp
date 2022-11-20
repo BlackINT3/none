@@ -13,3 +13,10 @@
 ** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 **
 ****************************************************************************/
+#include "../common/knone-common.h"
+#include "../internal/knone-internal.h"
+#include "knone-str.h"
+
+namespace KNONE {
+
+} // namespace KNONE

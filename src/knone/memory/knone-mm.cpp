@@ -17,6 +17,31 @@
 #include <os/knone-os.h>
 #include <internal/knone-assist.h>
 
+typedef struct
+{
+	LIST_ENTRY InLoadOrderLinks;
+	PVOID ExceptionTable;
+	UINT32 ExceptionTableSize;
+	PVOID GpValue;
+	PVOID* NonPagedDebugInfo;
+	PVOID DllBase;
+	PVOID EntryPoint;
+	UINT32 SizeOfImage;
+	UNICODE_STRING FullDllName;
+	UNICODE_STRING BaseDllName;
+	UINT32 Flags;
+	UINT16 LoadCount;
+	UINT16 SignatureInfo;
+	PVOID SectionPointer;
+	UINT32 CheckSum;
+	UINT32 CoverageSectionSize;
+	PVOID CoverageSection;
+	PVOID LoadedImports;
+	PVOID Spare;
+	UINT32 SizeOfImageNotRounded;
+	UINT32 TimeDateStamp;
+} KLDR_DATA_TABLE_ENTRY, *PKLDR_DATA_TABLE_ENTRY;
+
 namespace KNONE {
 	
 VOID MmEnableWP()
@@ -123,6 +148,22 @@ PVOID MmGetRoutineAddress(IN PCWSTR name)
 	UNICODE_STRING ustr;
 	RtlInitUnicodeString(&ustr, name);
 	return MmGetSystemRoutineAddress(&ustr);
+}
+
+PVOID MmGetModuleBase(IN PDRIVER_OBJECT drvobj, IN WCHAR* name)
+{
+	UNICODE_STRING ustr;
+	RtlInitUnicodeString(&ustr, name);
+
+	PKLDR_DATA_TABLE_ENTRY node = (PKLDR_DATA_TABLE_ENTRY)(drvobj->DriverSection);
+	PKLDR_DATA_TABLE_ENTRY first = (PKLDR_DATA_TABLE_ENTRY)node->InLoadOrderLinks.Flink;
+	node = (PKLDR_DATA_TABLE_ENTRY)first->InLoadOrderLinks.Flink;	//not traverse the first
+	while ((PKLDR_DATA_TABLE_ENTRY)node->InLoadOrderLinks.Flink != first) {
+		if (!RtlCompareUnicodeString(&ustr, &node->BaseDllName, TRUE))
+			return node->DllBase;
+		node = (PKLDR_DATA_TABLE_ENTRY)node->InLoadOrderLinks.Flink;
+	}
+	return NULL;
 }
 
 BOOLEAN MmIsAddressValidSafe(PVOID addr, ULONG size)

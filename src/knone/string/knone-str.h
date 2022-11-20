@@ -14,3 +14,7 @@
 **
 ****************************************************************************/
 #pragma once
+#include <ntifs.h>
+
+namespace KNONE {
+} // namespace KNONE

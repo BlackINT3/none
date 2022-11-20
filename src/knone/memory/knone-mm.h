@@ -25,6 +25,7 @@ KNONE_API KIRQL MmWriteProtectOff();
 KNONE_API BOOLEAN MmReadKernelMemory(PVOID addr, PVOID buf, ULONG len);
 KNONE_API BOOLEAN MmWriteKernelMemory(PVOID addr, PVOID buf, ULONG len);
 KNONE_API PVOID MmGetRoutineAddress(IN PCWSTR name);
+KNONE_API PVOID MmGetModuleBase(IN PDRIVER_OBJECT drvobj, IN WCHAR* name);
 KNONE_API BOOLEAN MmIsAddressValidSafe(PVOID addr, ULONG size = 1);
 
 } // namespace KNONE
