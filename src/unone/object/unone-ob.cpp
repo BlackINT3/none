@@ -510,5 +510,23 @@ std::wstring ObGetDriverPathW(__in LPVOID driver)
 	return L"";
 }
 
+/*++
+Description:
+	get current ntoskrnl.exe path
+Arguments:
+	void
+Return:
+	path
+--*/
+std::string ObGetNtKernelFilePath()
+{
+	std::string path;
+	DWORD needed = 1;
+	PVOID base = NULL;
+	if (EnumDeviceDrivers(&base, sizeof(LPVOID), &needed)) {
+		path = ObGetDriverPathA(base);
+	}
+	return path;
+}
 
 }

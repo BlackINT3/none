@@ -414,11 +414,13 @@ std::string PeGetSymidByFile(__in std::wstring path)
 {
 	DWORD file_size = 0;
 	HANDLE fd, hmap;
+	std::string str;
 	CHAR* file_buf = MmMapFileW(path, file_size, fd, hmap);
-	if (!file_buf) return NULL;
-	std::string pdb_file = PeGetSymid(file_buf, UNONE::BASE_FILE);
-	MmUnmapFile(file_buf, fd, hmap);
-	return pdb_file;
+	if (file_buf) {
+		str = PeGetSymid(file_buf, UNONE::BASE_FILE);
+		MmUnmapFile(file_buf, fd, hmap);
+	}
+	return str;
 }
 
 /*++
@@ -475,10 +477,12 @@ std::string PeGetPdbByFile(__in std::wstring path)
 {
 	DWORD file_size = 0;
 	HANDLE fd, hmap;
+	std::string pdb_file;
 	CHAR* file_buf = MmMapFileW(path, file_size, fd, hmap);
-	if (!file_buf) return NULL;
-	std::string pdb_file = PeGetPdb(file_buf, UNONE::BASE_FILE);
-	MmUnmapFile(file_buf, fd, hmap);
+	if (file_buf) {
+		pdb_file = PeGetPdb(file_buf, UNONE::BASE_FILE);
+		MmUnmapFile(file_buf, fd, hmap);
+	}
 	return pdb_file;
 }
 

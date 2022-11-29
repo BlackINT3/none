@@ -14,3 +14,29 @@
 **
 ****************************************************************************/
 #pragma once
+#include <ntifs.h>
+
+typedef struct
+{
+	LIST_ENTRY InLoadOrderLinks;
+	PVOID ExceptionTable;
+	UINT32 ExceptionTableSize;
+	PVOID GpValue;
+	PVOID* NonPagedDebugInfo;
+	PVOID DllBase;
+	PVOID EntryPoint;
+	UINT32 SizeOfImage;
+	UNICODE_STRING FullDllName;
+	UNICODE_STRING BaseDllName;
+	UINT32 Flags;
+	UINT16 LoadCount;
+	UINT16 SignatureInfo;
+	PVOID SectionPointer;
+	UINT32 CheckSum;
+	UINT32 CoverageSectionSize;
+	PVOID CoverageSection;
+	PVOID LoadedImports;
+	PVOID Spare;
+	UINT32 SizeOfImageNotRounded;
+	UINT32 TimeDateStamp;
+} KLDR_DATA_TABLE_ENTRY, * PKLDR_DATA_TABLE_ENTRY;

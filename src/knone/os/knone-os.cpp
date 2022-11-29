@@ -74,6 +74,13 @@ NTOS_VERSION OsNtVersion()
 		if (info.dwBuildNumber == 18362) return NTOS_WIN10_1903;
 		if (info.dwBuildNumber == 18363) return NTOS_WIN10_1909;
 		if (info.dwBuildNumber == 19041) return NTOS_WIN10_2004;
+		if (info.dwBuildNumber == 19042) return NTOS_WIN10_20H2;
+		if (info.dwBuildNumber == 19043) return NTOS_WIN10_21H1;
+		if (info.dwBuildNumber == 19044) return NTOS_WIN10_21H2;
+		if (info.dwBuildNumber == 19045) return NTOS_WIN10_22H2;
+		if (info.dwBuildNumber == 22000) return NTOS_WIN11_21H2;
+		if (info.dwBuildNumber == 22621) return NTOS_WIN11_22H2;
+		if (info.dwBuildNumber > 22621) return NTOS_WIN_MAX;
 	}
 	default:
 		break;

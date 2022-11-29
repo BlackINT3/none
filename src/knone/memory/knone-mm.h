@@ -22,7 +22,7 @@ KNONE_API VOID MmEnableWP();
 KNONE_API VOID MmDisableWP();
 KNONE_API VOID MmWriteProtectOn(IN KIRQL Irql);
 KNONE_API KIRQL MmWriteProtectOff();
-KNONE_API BOOLEAN MmReadKernelMemory(PVOID addr, PVOID buf, ULONG len);
+KNONE_API ULONG MmReadKernelMemory(PVOID addr, PVOID buf, ULONG len);
 KNONE_API BOOLEAN MmWriteKernelMemory(PVOID addr, PVOID buf, ULONG len);
 KNONE_API PVOID MmGetRoutineAddress(IN PCWSTR name);
 KNONE_API PVOID MmGetModuleBase(IN PDRIVER_OBJECT drvobj, IN WCHAR* name);

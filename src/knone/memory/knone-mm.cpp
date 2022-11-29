@@ -14,33 +14,10 @@
 **
 ****************************************************************************/
 #include "knone-mm.h"
+#include <common/common.h>
 #include <os/knone-os.h>
+#include <native/knone-native.h>
 #include <internal/knone-assist.h>
-
-typedef struct
-{
-	LIST_ENTRY InLoadOrderLinks;
-	PVOID ExceptionTable;
-	UINT32 ExceptionTableSize;
-	PVOID GpValue;
-	PVOID* NonPagedDebugInfo;
-	PVOID DllBase;
-	PVOID EntryPoint;
-	UINT32 SizeOfImage;
-	UNICODE_STRING FullDllName;
-	UNICODE_STRING BaseDllName;
-	UINT32 Flags;
-	UINT16 LoadCount;
-	UINT16 SignatureInfo;
-	PVOID SectionPointer;
-	UINT32 CheckSum;
-	UINT32 CoverageSectionSize;
-	PVOID CoverageSection;
-	PVOID LoadedImports;
-	PVOID Spare;
-	UINT32 SizeOfImageNotRounded;
-	UINT32 TimeDateStamp;
-} KLDR_DATA_TABLE_ENTRY, *PKLDR_DATA_TABLE_ENTRY;
 
 namespace KNONE {
 	
@@ -83,10 +60,10 @@ typedef NTSTATUS(NTAPI *__MmCopyMemory)(
 	PSIZE_T NumberOfBytesTransferred
 );
 
-BOOLEAN MmReadKernelMemory(PVOID addr, PVOID buf, ULONG len)
+ULONG MmReadKernelMemory(PVOID addr, PVOID buf, ULONG len)
 {
-	BOOLEAN ret = FALSE;
-	if (OsNtVersion() >= NTOS_WIN81) {
+	ULONG readed = 0;
+	if (ARKDRV.ver >= NTOS_WIN81) {
 		PVOID data = ExAllocatePool(NonPagedPool, len);
 		if (data) {
 			auto pMmCopyMemory = (__MmCopyMemory)MmGetRoutineAddress(L"MmCopyMemory");
@@ -95,18 +72,18 @@ BOOLEAN MmReadKernelMemory(PVOID addr, PVOID buf, ULONG len)
 				MM_COPY_ADDRESS cpaddr;
 				cpaddr.VirtualAddress = addr;
 				NTSTATUS status = pMmCopyMemory(data, cpaddr, len, MM_COPY_MEMORY_VIRTUAL, &cplen);
-				if (NT_SUCCESS(status)) {
+				if (NT_SUCCESS(status) || status == STATUS_ACCESS_VIOLATION) {
 					if (!buf) {
-						if (cplen == len) ret = TRUE;
+						if (cplen == len) readed = len;
 					} else {
-						RtlCopyMemory(buf, data, cplen);
-						ret = TRUE;
+						if (cplen) RtlCopyMemory(buf, data, cplen);
+						readed = (ULONG)cplen;
 					}
 				}
 			}
 			ExFreePool(data);
 		}
-		return ret;
+		return readed;
 	}
 
 	// [TDOO] BYTE_OFFSET PAGE_ALIGN
@@ -117,10 +94,10 @@ BOOLEAN MmReadKernelMemory(PVOID addr, PVOID buf, ULONG len)
 		if (va) {
 			if (buf) RtlCopyMemory(buf, va, len);
 			MmUnmapIoSpace(va, len);
-			ret = TRUE;
+			readed = len;
 		}
 	}
-	return ret;
+	return readed;
 }
 
 BOOLEAN MmWriteKernelMemory(PVOID addr, PVOID buf, ULONG len)
@@ -168,7 +145,8 @@ PVOID MmGetModuleBase(IN PDRIVER_OBJECT drvobj, IN WCHAR* name)
 
 BOOLEAN MmIsAddressValidSafe(PVOID addr, ULONG size)
 {
-	return MmReadKernelMemory(addr, NULL, size);
+	auto readed = MmReadKernelMemory(addr, NULL, size);
+	return (readed == size);
 }
 
 } // namespace KNONE

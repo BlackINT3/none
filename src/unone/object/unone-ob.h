@@ -44,5 +44,5 @@ UNONE_API std::string ObGetDriverNameA(__in LPVOID driver);
 UNONE_API std::wstring ObGetDriverNameW(__in LPVOID driver);
 UNONE_API std::string ObGetDriverPathA(__in LPVOID driver);
 UNONE_API std::wstring ObGetDriverPathW(__in LPVOID driver);
-
+UNONE_API std::string ObGetNtKernelFilePath();
 } // namespace UNONE
